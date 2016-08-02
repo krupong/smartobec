@@ -1,0 +1,819 @@
+<script type="text/javascript" src="./css/js/calendarDateInput2.js"></script> 
+
+<?php
+/** ensure this file is being included by a parent file */
+defined( '_VALID_' ) or die( 'Direct Access to this location is not allowed.' );
+
+require_once "modules/book/time_inc.php";	
+$user=$_SESSION['login_user_id'];
+
+//ส่วนหัว
+echo "<br />";
+if(!(($index==1) or ($index==2))){
+
+echo "<table width='100%' border='0' align='center'>";
+echo "<tr align='center'><td><font color='#006666'><strong>หนังสือส่ง</strong></font></td></tr>";
+echo "</table>";
+}
+
+//ส่วนฟอร์มรับข้อมูล
+if($index==1){
+
+$timestamp = mktime(date("H"), date("i"),date("s"), date("m") ,date("d"), date("Y"))  ;	
+//timestamp เวลาปัจจุบัน 
+$rand_number=rand();
+$ref_id = $timestamp."x".$rand_number;
+$_SESSION ['ref_id'] = $ref_id ;
+
+echo "<form Enctype = multipart/form-data id='frm1' name='frm1'>";
+echo "<Center>";
+echo "<Font color='#006666' Size=3><B>ส่งหนังสือราชการ</Font>";
+echo "</Cener>";
+echo "<Br>";
+echo "<table border='1' width='700' id='table1' style='border-collapse: collapse' bordercolor='#C0C0C0'>";
+echo "<tr bgcolor='#9900CC'>";
+echo "<td colspan='4' height='23' align='left'><font size='2' color='#FFFFFF'>&nbsp;กรุณาระบุรายละเอียด</font></td>";
+echo "</tr>";
+
+// *ผู้ส่งเป็น สพท.
+if($_SESSION['login_status']<=4){
+echo "<tr>";
+echo "<td width='94' align='right'><span lang='th'><font size='2' color='#0000FF'>จาก&nbsp;</font></span></td>";
+echo "<td width='514' colspan='3' align='left'>";
+
+	$sql_workgroup= "select * from system_workgroup";
+	$dbquery_workgroup = mysqli_query($connect,$sql_workgroup);
+	While ($result_workgroup = mysqli_fetch_array($dbquery_workgroup)){
+	echo  "&nbsp;&nbsp;<input type='radio'  name='workgroup' value='$result_workgroup[workgroup]'>&nbsp;$result_workgroup[workgroup_desc]<br>";
+	}
+echo "</td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td width='94' align='right'><font size='2' color='#0000FF'>ถึง&nbsp;</font></span></td>";
+echo "<td colspan='3' align='left'>&nbsp;&nbsp;<input type='radio' value='all' name='sendto'>&nbsp;สถานศึกษารัฐบาลทุกแห่ง";
+echo "<br>&nbsp;&nbsp;<input type='radio' value='some' name='sendto' onClick=\"window.open('modules/book/main/select_send.php?sd_index=some','PopUp','width=700,height=600,scrollbars,status'); \">&nbsp;สถานศึกษาบางแห่ง";
+
+	$sql_group= "select * from book_group";
+	$dbquery_group = mysqli_query($connect,$sql_group);
+	While ($result_group = mysqli_fetch_array($dbquery_group)){
+	echo  "<br>&nbsp;&nbsp;<input type='radio'  name='sendto' value='$result_group[grp_id]' onClick=\"window.open('modules/book/main/select_send.php?sd_index=$result_group[grp_id]','PopUp','width=700,height=600,scrollbars,status'); \">&nbsp;$result_group[grp_name]";
+	}
+echo "</td></tr>";
+}  //end *
+
+// **ผู้ส่งเป็นสถานศึกษา
+if(($_SESSION['login_status']>10) and ($_SESSION['login_status']<=14)){
+echo "<tr>";
+echo "<td width='94' align='right'><span lang='th'><font size='2' color='#0000FF'>จาก&nbsp;</font></span></td>";
+echo "<td width='514' colspan='3' align='left'>";
+
+	$sql_school= "select * from system_school where school_code='$_SESSION[user_school]' ";
+	$dbquery_school = mysqli_query($connect,$sql_school);
+	$result_school = mysqli_fetch_array($dbquery_school);
+	echo  "&nbsp;&nbsp;<input type='radio' name='workgroup' value='$result_school[school_code]' checked>&nbsp;$result_school[school_name]";
+	
+echo "</td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td width='94' align='right'><font size='2' color='#0000FF'>ถึง&nbsp;</font></span></td>";
+echo "<td colspan='3' align='left'>&nbsp;&nbsp;<input type='radio' value='saraban' name='sendto'>&nbsp;สารบรรณกลาง$_SESSION[office_name]";
+
+	$sql_workgroup= "select * from system_workgroup";
+	$dbquery_workgroup = mysqli_query($connect,$sql_workgroup);
+	While ($result_workgroup = mysqli_fetch_array($dbquery_workgroup)){
+	echo  "<br>&nbsp;&nbsp;<input type='radio'  name='sendto' value='$result_workgroup[workgroup]'>&nbsp;$result_workgroup[workgroup_desc]";
+	}
+
+echo "<br>&nbsp;&nbsp;<input type='radio' value='all' name='sendto'>&nbsp;สถานศึกษารัฐบาลทุกแห่ง";
+
+echo "<br>&nbsp;&nbsp;<input type='radio' value='some' name='sendto' onClick=\"window.open('modules/book/main/select_send.php?sd_index=some','PopUp','width=700,height=600,scrollbars,status'); \">&nbsp;สถานศึกษาบางแห่ง";
+echo "</td></tr>";
+}  //end **
+
+
+echo "<tr>";
+echo "<td align='right'><span lang='th'><font size='2' color='#0000FF'>ระดับความสำคัญ&nbsp;</font></span></td>";
+echo "<td colspan='3' align='left'>&nbsp;<input type='radio' name='level' value='1' checked><font size='2' color='#006600'>ปกติ</font><span lang='en-us'><font size='2'>&nbsp;
+			</font><input type='radio' name='level' value='2'></span><font size='2'><font color='#780634'>ด่วน</font>&nbsp;
+			</font><input type='radio' name='level' value='3'><font size='2'><font color='#993300'>ด่วนมาก</font>&nbsp;
+			</font><input type='radio' name='level' value='4'><font size='2' color='#FF0000'>ด่วนที่สุด</font></td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td align='right'><span lang='th'><font size='2' color='#0000FF'>ความลับ&nbsp;</font></span></td>";
+echo "<td colspan='3' align='left'>&nbsp;<input type='radio' name='secret' value='0' checked><font size='2' color='#006600'>ไม่ลับ</font><span lang='en-us'><font size='2'>&nbsp;
+			</font><input type='radio' name='secret' value='1'><font size='2' color='#FF0000'>ลับ</font></td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td align='right'><span lang='th'><font size='2' color='#0000FF'>เลขที่หนังสือ&nbsp;</font></span></td><td>&nbsp;<FONT SIZE='2' COLOR=''></FONT><input type='text' name='book_no' size='20' value='ที่'  style='background-color: #FBEAD7'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ลงวันที่</td>";
+echo "<td colspan='2' align='left'>";
+?>
+<script>DateInput('signdate', true, 'YYYY-MM-DD')</script>
+<?php
+echo "</td>";
+echo "</tr>";
+
+
+echo "<tr>";
+echo "<td align='right'><span lang='th'><font size='2' color='#0000FF'>เรื่อง&nbsp;</font></span></td>";
+echo "<td colspan='3' align='left'>&nbsp;<input type='text' name='subject' size='76'  style='background-color: #E7D8EB'></td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td width='94' align='right' height='47'><span lang='th'><font size='2' color='#0000FF'>เนื้อหาโดยสรุป&nbsp;</font></span></td>";
+echo "<td height='47' width='514' colspan='3'  align='left'>&nbsp;<textarea rows='5' name='detail' cols='55'  style='background-color: #E6EFE4' ></textarea></td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td width='371' align='right' colspan='2'><p align='center'><font size='2' color='#800000'>แนบไฟล์(ถ้ามี)</font></td>";
+echo "<td width='238' align='center' colspan='1'><p align='center'><font size='2' color='#800000'>คำอธิบายไฟล์</font></td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td width='94' align='right'><font size='2' color='#0000FF'>ไฟล์แนบ 1&nbsp;</font></td>";
+echo "<td width='274'>&nbsp;<input type='file' name='myfile1' size='26' style='background-color: #FFDDFF'></td>";
+echo "<td width='238' align='center' colspan='2'><input type='text' name='dfile1' size='31' style='background-color: #BBD1FF'></td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td width='94' align='right'><font size='2' color='#0000FF'>ไฟล์แนบ 2&nbsp;</font></td>";
+echo "<td width='274'>&nbsp;<input type='file' name='myfile2' size='26' style='background-color: #FFDDFF'> </td>";
+echo "<td width='238' align='center' colspan='2'><input type='text' name='dfile2' size='31' style='background-color: #BBD1FF'></td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td width='94' align='right'><font size='2' color='#0000FF'>ไฟล์แนบ 3&nbsp;</font></td>";
+echo "<td width='274'>&nbsp;<input type='file' name='myfile3' size='26' style='background-color: #FFDDFF'> </td>";
+echo "<td width='238' align='center' colspan='2'><input type='text' name='dfile3' size='31' style='background-color: #BBD1FF'></td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td width='94' align='right'><font size='2' color='#0000FF'>ไฟล์แนบ 4&nbsp;</font></td>";
+echo "<td width='274'>&nbsp;<input type='file' name='myfile4' size='26' style='background-color: #FFDDFF'> </td>";
+echo "<td width='238' align='center' colspan='2'><input type='text' name='dfile4' size='31' style='background-color: #BBD1FF'></td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td width='94' align='right'><font size='2' color='#0000FF'>ไฟล์แนบ 5&nbsp;</font></td>";
+echo "<td width='274'>&nbsp;<input type='file' name='myfile5' size='26' style='background-color: #FFDDFF'> </td>";
+echo "<td width='238' align='center' colspan='2'><input type='text' name='dfile5' size='31' style='background-color: #BBD1FF'></td>";
+echo "</tr>";
+
+echo "<tr>";
+echo "<td align='center' colspan='4'><FONT SIZE='2' COLOR='#CC9900'>เฉพาะไฟล์ doc, docx, pdf, xls, xlsx, gif, jpg, zip, rar เท่านั้น</FONT></td>";
+echo "</tr>";
+echo "<input name='ref_id' type='hidden' value='$ref_id'>";
+echo "<tr>";
+echo "<td align='center' colspan='4'><BR><INPUT TYPE='button' name='smb' value='ตกลง' onclick='goto_url(1)' class=entrybutton>&nbsp;&nbsp;<input type='reset' value='Reset' name='reset'></td>";
+echo "</tr>";
+echo "</Table>";
+echo "</form>";
+}
+
+//ส่วนยืนยันการลบข้อมูล
+if($index==2) {
+echo "<table width='500' border='0' align='center'>";
+echo "<tr><td align='center'><font color='#990000' size='4'>โปรดยืนยันความต้องการลบข้อมูลอีกครั้ง</font><br></td></tr>";
+echo "<tr><td align=center>";
+echo "<INPUT TYPE='button' name='smb' value='ยืนยัน' onclick='location.href=\"?option=book&task=main/send_mobile&index=3&id=$_GET[id]&page=$_REQUEST[page]\"'>
+		&nbsp;&nbsp;<INPUT TYPE='button' name='back' value='ยกเลิก' onclick='location.href=\"?option=book&task=main/send_mobile&page=$_REQUEST[page]\"'";
+echo "</td></tr></table>";
+}
+
+//ส่วนลบข้อมูล
+if($index==3){
+	$sql="select * from book_main  where ms_id='$_GET[id]'";
+	$dbquery = mysqli_query($connect,$sql);
+	$ref_result = mysqli_fetch_array($dbquery);
+	$ref_id=$ref_result['ref_id'];
+
+	$sql="select * from book_filebook where ref_id='$ref_id'";
+	$dbquery_file = mysqli_query($connect,$sql);
+	While ($result_file = mysqli_fetch_array($dbquery_file)){
+	$file=	$result_file['file_name'];
+	$path_file="modules/book/upload_files/".$file;
+			if(file_exists($path_file)){
+			unlink($path_file);	
+			}
+	}
+
+$sql = "delete from book_filebook where ref_id='$ref_id'";
+$dbquery = mysqli_query($connect,$sql);
+
+$sql = "delete from book_sendto_answer where ref_id='$ref_id'";
+$dbquery = mysqli_query($connect,$sql);
+
+$sql = "delete from book_main where ms_id='$_GET[id]'";
+$dbquery = mysqli_query($connect,$sql);
+}
+
+//ส่วนบันทึกข้อมูล
+if($index==4){
+$sizelimit = 20000*1024 ;  //ขนาดไฟล์
+
+$subject = $_POST ['subject'] ;
+$detail = $_POST ['detail'] ;
+$dfile1 = $_POST ['dfile1'] ;
+$dfile2 = $_POST ['dfile2'] ;
+$dfile3 = $_POST ['dfile3'] ;
+$dfile4 = $_POST ['dfile4'] ;
+$dfile5 = $_POST ['dfile5'] ;
+
+/// file
+$myfile1 = $_FILES ['myfile1'] ['tmp_name'] ;
+$myfile1_name = $_FILES ['myfile1'] ['name'] ;
+$myfile1_size = $_FILES ['myfile1'] ['size'] ;
+$myfile1_type = $_FILES ['myfile1'] ['type'] ;
+
+ $array_last1 = explode("." ,$myfile1_name) ;
+ $c1 =count ($array_last1) - 1 ;
+ $lastname1 = strtolower ($array_last1 [$c1] ) ;
+
+$alert_files="";
+$alert_filesize="";
+
+ if  ($myfile1<>"") {
+		 if ($lastname1 =="doc" or $lastname1 =="docx" or $lastname1 =="rar" or $lastname1 =="pdf" or $lastname1 =="xls" or $lastname1 =="xlsx" or $lastname1 =="zip" or $lastname1 =="jpg" or $lastname1 =="gif" ) { 
+		  }else {
+			 $alert_files.= "-ไม่อนุญาตให้ทำการแนบไฟล์ $myfile1_name " ;
+		  } 
+
+		  If ($myfile1_size>$sizelimit) {
+			  $alert_filesize.= "-ไฟล์ $myfile1_name มีขนาดใหญ่กว่าที่กำหนด " ;
+		  }
+ }
+  ####
+
+$myfile2 = $_FILES ['myfile2'] ['tmp_name'] ;
+$myfile2_name = $_FILES ['myfile2'] ['name'] ;
+$myfile2_size = $_FILES ['myfile2'] ['size'] ;
+$myfile2_type = $_FILES ['myfile2'] ['type'] ;
+
+$array_last2 = explode("." ,$myfile2_name) ;
+ $c2 =count ($array_last2) - 1 ;
+ $lastname2 = strtolower ($array_last2 [$c2] ) ;
+
+  if  ($myfile2<>"") {
+		 if ($lastname2 =="doc" or $lastname2 =="docx" or $lastname2 =="rar" or $lastname2 =="pdf" or $lastname2 =="xls" or $lastname2 =="xlsx" or $lastname2 =="zip" or $lastname2 =="jpg" or $lastname2 =="gif") { 
+		  }else {
+			$alert_files.= "-ไม่อนุญาตให้ทำการแนบไฟล์ $myfile2_name " ;
+		  } 
+
+		  If ($myfile2_size>$sizelimit) {
+			  $alert_filesize.= "-ไฟล์ $myfile2_name มีขนาดใหญ่กว่าที่กำหนด" ;
+		  }
+  }
+  ####
+$myfile3 = $_FILES ['myfile3'] ['tmp_name'] ;
+$myfile3_name = $_FILES ['myfile3'] ['name'] ;
+$myfile3_size = $_FILES ['myfile3'] ['size'] ;
+$myfile3_type = $_FILES ['myfile3'] ['type'] ;
+$array_last3 = explode("." ,$myfile3_name) ;
+ $c3 =count ($array_last3) - 1 ;
+ $lastname3 = strtolower ($array_last3 [$c3] ) ;
+
+  if  ($myfile3<>"") {
+		 if ($lastname3 =="doc" or $lastname3 =="docx" or $lastname3 =="rar" or $lastname3 =="pdf" or $lastname3 =="xls" or $lastname3 =="xlsx" or $lastname3 =="zip" or $lastname3 =="jpg" or $lastname3 =="gif") { 
+		  }else {
+			 $alert_files.= "-ไม่อนุญาตให้ทำการแนบไฟล์ $myfile3_name " ;
+		  } 
+
+		  If ($myfile3_size>$sizelimit) {
+			  $alert_filesize.= "-ไฟล์ $myfile3_name มีขนาดใหญ่กว่าที่กำหนด " ;
+		  }
+  }
+  ####
+$myfile4 = $_FILES ['myfile4'] ['tmp_name'] ;
+$myfile4_name = $_FILES ['myfile4'] ['name'] ;
+$myfile4_size = $_FILES ['myfile4'] ['size'] ;
+$myfile4_type = $_FILES ['myfile4'] ['type'] ;
+$array_last4 = explode("." ,$myfile4_name) ;
+ $c4 =count ($array_last4) - 1 ;
+ $lastname4 = strtolower ($array_last4 [$c4] ) ;
+
+  if  ($myfile4<>"") {
+		 if ($lastname4 =="doc" or $lastname4 =="docx" or $lastname4 =="rar" or $lastname4 =="pdf" or $lastname4 =="xls" or $lastname4 =="xlsx" or $lastname4 =="zip" or $lastname4 =="jpg" or $lastname4 =="gif") { 
+		  }else {
+			 $alert_files.= "-ไม่อนุญาตให้ทำการแนบไฟล์ $myfile4_name " ;
+		  } 
+
+		  If ($myfile4_size>$sizelimit) {
+			  $alert_filesize.= "-ไฟล์ $myfile4_name มีขนาดใหญ่กว่าที่กำหนด" ;
+		  }
+  }
+  ####
+$myfile5 = $_FILES ['myfile5'] ['tmp_name'] ;
+$myfile5_name = $_FILES ['myfile5'] ['name'] ;
+$myfile5_size = $_FILES ['myfile5'] ['size'] ;
+$myfile5_type = $_FILES ['myfile5'] ['type'] ;
+$array_last5 = explode("." ,$myfile5_name) ;
+ $c5 =count ($array_last5) - 1 ;
+ $lastname5 = strtolower ($array_last5 [$c5] ) ;
+
+  if  ($myfile5<>"") {
+		 if ($lastname5 =="doc" or $lastname5 =="docx" or $lastname5 =="rar" or $lastname5 =="pdf" or $lastname5 =="xls" or $lastname5 =="xlsx" or $lastname5 =="zip" or $lastname5 =="jpg" or $lastname5 =="gif") { 
+		  }else {
+			 $alert_files.= "-ไม่อนุญาตให้ทำการแนบไฟล์ $myfile5_name " ;
+		  } 
+
+		  If ($myfile5_size>$sizelimit) {
+			  $alert_filesize.= "-ไฟล์ $myfile5_name มีขนาดใหญ่กว่าที่กำหนด " ;
+		  }
+  }
+  ####
+////
+
+if(!isset($_POST['sendto'])){
+$_POST['sendto']="";
+}
+
+if($_POST['sendto']=="" || $_POST['subject']=="" ||$_POST['detail'] ==""){
+	echo "<CENTER><font size=\"2\" color=\"#008000\">กรอกข้อมูลไม่ครบ หรืออาจอัพโหลดไฟล์ใหญ่เกินข้อกำหนดของServer<br><br>";
+	echo "<input type=\"button\" value=\"แก้ไขข้อมูล\" onClick=\"javascript:history.go(-1)\" ></CENTER>" ;
+	exit(); 
+} #จบ
+
+
+// check file size  file name
+if ($alert_files<> "" || $alert_filesize<> "" ) {
+
+echo "<B><FONT SIZE=2 COLOR=#990000>มีข้อผิดพลาดเกี่ยวกับไฟล์ของคุณ ดังรายละเอียด</FONT></B><BR>" ;
+echo "<FONT SIZE=2 COLOR=#990099>" ;
+ echo  $alert_files ;
+ echo  $alert_filesize ;
+ echo "</FONT>" ;
+ echo "&nbsp;&nbsp;&nbsp;<input type=\"button\" value=\"&nbsp;&nbsp;แก้ไข&nbsp;&nbsp;\" onClick=\"javascript:history.go(-1)\" ></CENTER>" ;
+exit () ;
+}
+
+
+//ตรวจสอบว่ามีผู้รับหรือยัง สำหรับสพท.ส่ง
+// ***
+if($_SESSION['login_status']<=4){
+$sql_send_num = mysqli_query($connect,"SELECT * FROM book_sendto_answer WHERE ref_id='$_POST[ref_id]' ") ;
+$send_num = mysqli_num_rows ($sql_send_num) ;
+if ($send_num==0 and $_POST['sendto']!='all') {
+echo "<div align='center'>";
+echo "<B><FONT SIZE=2 COLOR=#990000>ยังไม่ได้ระบุผู้รับหนังสือ</FONT></B><BR><BR>" ;
+ echo "&nbsp;&nbsp;&nbsp;<input type=\"button\" value=\"&nbsp;&nbsp;แก้ไข&nbsp;&nbsp;\" onClick=\"javascript:history.go(-1)\" ></CENTER>" ;
+echo "</div>";
+exit () ;
+}
+} //end ***
+
+//ตรวจสอบว่ามีผู้รับหรือยัง สำหรับโรงเรียน.ส่ง
+// ***
+if(($_SESSION['login_status']>10) and ($_SESSION['login_status']<=14)){	
+$sql_send_num = mysqli_query($connect,"SELECT * FROM book_sendto_answer WHERE ref_id='$_POST[ref_id]' ") ;
+$send_num = mysqli_num_rows ($sql_send_num) ;
+if ($send_num==0 and $_POST['sendto']=='some') {
+echo "<div align='center'>";
+echo "<B><FONT SIZE=2 COLOR=#990000>ยังไม่ได้ระบุผู้รับหนังสือ</FONT></B><BR><BR>" ;
+ echo "&nbsp;&nbsp;&nbsp;<input type=\"button\" value=\"&nbsp;&nbsp;แก้ไข&nbsp;&nbsp;\" onClick=\"javascript:history.go(-1)\" ></CENTER>" ;
+echo "</div>";
+exit () ;
+}
+} //end ***
+
+//ส่วนการบันทึก
+$day_now=date("Y-m-d H:i:s");
+	if($_SESSION['login_status']<=4){
+	$book_type=1;  //ผู้ส่งคือสพท
+	}
+	else{
+	$book_type=2;  //ผู้ส่งคือโรงเรียน
+	}
+	
+//ตรวจสอบ ref_id
+if(!isset($_POST['ref_id'])){
+echo "<script>alert('มีข้อผิดพลาดเกี่ยวกับเลขอ้างอิงในระบบ ยกเลิกการส่งหนังสือในครั้งนี้ กรุณาส่งใหม่อีกครั้ง'); document.location.href='?option=book&task=main/send_mobile&index=1';</script>";
+exit();
+} 
+if($_POST['ref_id']==""){
+echo "<script>alert('มีข้อผิดพลาดเกี่ยวกับเลขอ้างอิงในระบบ ยกเลิกการส่งหนังสือในครั้งนี้ กรุณาส่งใหม่อีกครั้ง'); document.location.href='?option=book&task=main/send_mobile&index=1';</script>";
+exit();
+} 
+
+$sql = "insert into book_main (book_type, office, sender, level, secret, book_no, signdate, subject, detail, ref_id, send_date) values ('$book_type', $_POST[workgroup], '$user', '$_POST[level]', '$_POST[secret]', '$_POST[book_no]', '$_POST[signdate]','$_POST[subject]','$_POST[detail]','$_POST[ref_id]','$day_now')";
+$dbquery = mysqli_query($connect,$sql);
+
+if ($myfile1<>"" ) {
+$myfile1name=$_POST['ref_id']."_1.".$lastname1 ; 
+copy ($myfile1, "modules/book/upload_files/".$myfile1name)  ; 
+
+$sql = "insert into book_filebook (ref_id, file_name, file_des) values ('$_POST[ref_id]','$myfile1name','$dfile1')";
+$dbquery = mysqli_query($connect,$sql);
+
+unlink ($myfile1) ;
+}
+
+if ($myfile2<>"") {
+$myfile2name=$_POST['ref_id']."_2.".$lastname2 ; 
+copy ($myfile2, "modules/book/upload_files/".$myfile2name)  ; 
+$sql = "insert into book_filebook (ref_id, file_name, file_des) values ('$_POST[ref_id]','$myfile2name','$dfile2')";
+$dbquery = mysqli_query($connect,$sql);
+unlink ($myfile2) ;
+}
+
+if ($myfile3<>"") {
+$myfile3name=$_POST['ref_id']."_3.".$lastname3 ; 
+copy ($myfile3, "modules/book/upload_files/".$myfile3name)  ; 
+$sql = "insert into book_filebook (ref_id, file_name, file_des) values ('$_POST[ref_id]','$myfile3name','$dfile3')";
+$dbquery = mysqli_query($connect,$sql);
+unlink ($myfile3) ;
+}
+
+if ($myfile4<>"") {
+$myfile4name=$_POST['ref_id']."_4.".$lastname4 ; 
+copy ($myfile4, "modules/book/upload_files/".$myfile4name)  ; 
+$sql = "insert into book_filebook (ref_id, file_name, file_des) values ('$_POST[ref_id]','$myfile4name','$dfile4')";
+$dbquery = mysqli_query($connect,$sql);
+unlink ($myfile4) ;
+}
+
+if ($myfile5<>"") {
+$myfile5name=$_POST['ref_id']."_5.".$lastname5 ; 
+copy ($myfile5, "modules/book/upload_files/".$myfile5name)  ; 
+$sql = "insert into book_filebook (ref_id, file_name, file_des) values ('$_POST[ref_id]','$myfile5name','$dfile5')";
+$dbquery = mysqli_query($connect,$sql);
+unlink ($myfile5) ;
+}
+	
+//สำหรับสพท	
+if($_SESSION['login_status']<=4){
+			if($_POST['sendto']=='all') { 
+			$sql_sendto = "select school_code from system_school  where  school_type='1' order by school_code";
+			$dbquery_sendto = mysqli_query($connect,$sql_sendto);
+					While ($result_sendto = mysqli_fetch_array($dbquery_sendto)){
+					$sql=	"insert into book_sendto_answer (send_level, ref_id, send_to) values ('1', '$_POST[ref_id]','$result_sendto[school_code]')";
+					$dbquery = mysqli_query($connect,$sql);
+					}
+			}
+}	
+
+if(($_SESSION['login_status']>10) and ($_SESSION['login_status']<=14)){		
+			if($_POST['sendto']=='all') { 
+			$sql_sendto = "select school_code from system_school where school_code != '$_SESSION[user_school]' and school_type='1' order by school_code";
+			$dbquery_sendto = mysqli_query($connect,$sql_sendto);
+					While ($result_sendto = mysqli_fetch_array($dbquery_sendto)){
+					$sql=	"insert into book_sendto_answer (send_level, ref_id, send_to) values ('3', '$_POST[ref_id]','$result_sendto[school_code]')";
+					$dbquery = mysqli_query($connect,$sql);
+					}
+			}
+			else if($_POST['sendto']!='some'){
+					$sql=	"insert into book_sendto_answer (send_level, ref_id, send_to) values ('2', '$_POST[ref_id]','$_POST[sendto]')";
+					$dbquery = mysqli_query($connect,$sql);
+			}
+}			
+} //end index4
+
+
+//ส่วนแสดงผล
+if(!(($index==1) or ($index==2))){
+
+// อาเรย์ชื่อหน่วยงาาน
+$office_name_ar['saraban']="สาราบรรณกลาง";
+$sql_work_group = mysqli_query($connect,"SELECT * FROM  system_workgroup") ;
+while ($row_work_group= mysqli_fetch_array($sql_work_group)){
+$office_name_ar[$row_work_group['workgroup']]=$row_work_group['workgroup_desc'];
+}
+$sql_sch = mysqli_query($connect,"SELECT * FROM  system_school") ;
+while ($row_sch= mysqli_fetch_array($sql_sch)){
+$office_name_ar[$row_sch['school_code']]=$row_sch['school_name'];
+}
+
+
+if(!isset($_REQUEST['search_index'])){
+$_REQUEST['search_index']="";
+}
+if(!isset($_REQUEST['field'])){
+$_REQUEST['field']="";
+}
+if(!isset($_REQUEST['search'])){
+$_REQUEST['search']="";
+}
+
+if(!isset($_REQUEST['workgroup'])){
+$_REQUEST['workgroup']="";
+}
+
+//ส่วนของการแยกหน้า
+	if($_SESSION['login_status']<=5){
+			if($_REQUEST['search_index']==1){	
+					if($_REQUEST['workgroup']!=""){
+					$sql="select * from book_main where book_type='1' and $_REQUEST[field] like '%$_REQUEST[search]%' and office='$_REQUEST[workgroup]' ";
+					}
+					else{
+					$sql="select * from book_main where book_type='1' and $_REQUEST[field] like '%$_REQUEST[search]%' ";
+					}
+			}
+			else{
+			$sql="select * from book_main where book_type='1'";
+			}
+	$dbquery = mysqli_query($connect,$sql);
+	$num_rows = mysqli_num_rows($dbquery);
+	}
+	else if(($_SESSION['login_status']>10) and ($_SESSION['login_status']<=15)){
+			if($_REQUEST['search_index']==1){
+			$sql="select * from book_main where book_type='2' and office='$_SESSION[user_school]' and  $_REQUEST[field] like '%$_REQUEST[search]%' ";
+			}
+			else{
+			$sql="select * from book_main where book_type='2' and office='$_SESSION[user_school]' ";
+			}
+			$dbquery = mysqli_query($connect,$sql);
+			$num_rows = mysqli_num_rows($dbquery);
+	}
+
+$pagelen=20;  // 1_กำหนดแถวต่อหน้า
+$url_link="option=book&task=main/send_mobile&search_index=$_REQUEST[search_index]&field=$_REQUEST[field]&search=$_REQUEST[search]&workgroup=$_REQUEST[workgroup]";  // 2_กำหนดลิงค์ฺ
+$totalpages=ceil($num_rows/$pagelen);
+if(!isset($_REQUEST['page'])){
+$_REQUEST['page']="";
+}
+
+if($_REQUEST['page']==""){
+$page=$totalpages;
+		if($page<2){
+		$page=1;
+		}
+}
+else{
+		if($totalpages<$_REQUEST['page']){
+		$page=$totalpages;
+					if($page<1){
+					$page=1;
+					}
+		}
+		else{
+		$page=$_REQUEST['page'];
+		}
+}
+
+$start=($page-1)*$pagelen;
+
+if(($totalpages>1) and ($totalpages<6)){
+echo "<div align=center>";
+echo "หน้า	";
+			for($i=1; $i<=$totalpages; $i++)	{
+					if($i==$page){
+					echo "[<b><font size=+1 color=#990000>$i</font></b>]";
+					}
+					else {
+					echo "<a href=$PHP_SELF?$url_link&page=$i>[$i]</a>";
+					}
+			}
+echo "</div>";
+}			
+if($totalpages>5){
+			if($page <=3){
+			$e_page=5;
+			$s_page=1;
+			}
+			if($page>3){
+					if($totalpages-$page>=2){
+					$e_page=$page+2;
+					$s_page=$page-2;
+					}
+					else{
+					$e_page=$totalpages;
+					$s_page=$totalpages-5;
+					}
+			}
+			echo "<div align=center>";
+			if($page!=1){
+			$f_page1=$page-1;
+			echo "<<a href=$PHP_SELF?$url_link&page=1>แรก </a>";
+			echo "<<<a href=$PHP_SELF?$url_link&page=$f_page1>ก่อน </a>";
+			}
+			else {
+			echo "หน้า	";
+			}					
+			for($i=$s_page; $i<=$e_page; $i++){
+					if($i==$page){
+					echo "[<b><font size=+1 color=#990000>$i</font></b>]";
+					}
+					else {
+					echo "<a href=$PHP_SELF?$url_link&page=$i>[$i]</a>";
+					}
+			}
+			if($page<$totalpages)	{
+			$f_page2=$page+1;
+			echo "<a href=$PHP_SELF?$url_link&page=$f_page2> ถัด</a>>>";
+			echo "<a href=$PHP_SELF?$url_link&page=$totalpages> ท้าย</a>>";
+			}
+			echo " <select onchange=\"location.href=this.options[this.selectedIndex].value;\" size=\"1\" name=\"select\">";
+			echo "<option  value=\"\">หน้า</option>";
+				for($p=1;$p<=$totalpages;$p++){
+				echo "<option  value=\"?$url_link&page=$p\">$p</option>";
+				}
+			echo "</select>";
+echo "</div>";  
+}					
+//จบแยกหน้า
+?>
+<table border="1" width="100%" id="table2" style="border-collapse: collapse" align="center">
+				<tr bgcolor=#003399>
+					<td align="center">
+					<font face="Tahoma" color=#FFFFFF>ที่</font></td>
+					<td align="center">
+					<font face="Tahoma" color=#FFFFFF>เลขหนังสือ</font></td>
+					<td align="center"><font face="Tahoma" color=#FFFFFF>เรื่อง</font></td>
+					<td align="center">
+					<font face="Tahoma" color=#FFFFFF>ราย<br />ละเอียด</font></td>
+					<td align="center">
+					<font face="Tahoma" color=#FFFFFF>ลงวันที่</font></td>
+					<td align="center">
+					<font face="Tahoma" color=#FFFFFF>วันเวลาที่ส่ง</font></td>
+					<td align="center">
+					<font face="Tahoma" color=#FFFFFF>ผู้ส่ง</font></td>
+				</tr>
+</form>
+
+<?php
+	if($_SESSION['login_status']<=5){
+			if($_REQUEST['search_index']==1){	
+					if($_REQUEST['workgroup']!=""){
+					$sql="select * from book_main where book_type='1'  and $_REQUEST[field] like '%$_REQUEST[search]%' and office='$_REQUEST[workgroup]' order by ms_id limit $start,$pagelen";
+					}
+					else{
+					$sql="select * from book_main where book_type='1'  and $_REQUEST[field] like '%$_REQUEST[search]%' order by ms_id limit $start,$pagelen";
+					}
+			}
+			else{
+			$sql="select * from book_main where book_type='1' order by ms_id limit $start,$pagelen";
+			}
+	$dbquery = mysqli_query($connect,$sql);
+	}
+	else if(($_SESSION['login_status']>10) and ($_SESSION['login_status']<=15)){
+			if($_REQUEST['search_index']==1){
+			$sql="select * from book_main where book_type='2' and office='$_SESSION[user_school]' and $_REQUEST[field] like '%$_REQUEST[search]%' order by ms_id limit $start,$pagelen";
+			}
+			else{
+			$sql="select * from book_main where book_type='2' and office='$_SESSION[user_school]' order by ms_id limit $start,$pagelen";
+			}
+	$dbquery = mysqli_query($connect,$sql);
+	}
+
+$N=(($page-1)*$pagelen)+1; //*เกี่ยวข้องกับการแยกหน้า
+$M=1;
+
+While ($result = mysqli_fetch_array($dbquery)){
+		$id = $result['ms_id'];
+		$sender = $result['sender'];
+		$office = $result['office']; 
+		$ref_id = $result['ref_id'];
+		$level = $result['level'];
+		$book_no = $result['book_no'];
+		$signdate = $result['signdate'];
+		$subject = $result['subject'];
+		$ref_id = $result['ref_id'];
+		$rec_date = $result['send_date'];
+			if(($M%2) == 0)
+			$color="#ffffff";
+			else $color="#E5E5FF";
+$send_date=thai_date_4($rec_date);
+$signdate=thai_date_3($signdate);
+// ระดับความสำคัญ
+if ($level==1) {
+	$img_level = "<IMG SRC=\"modules/book/images/level1.gif\" WIDTH=\"20\" HEIGHT=\"11\" BORDER=\"0\" ALT=\"ปกติ\">" ;
+}else if ($level==2) {
+	$img_level = "<IMG SRC=\"modules/book/images/level2.gif\" WIDTH=\"20\" HEIGHT=\"11\" BORDER=\"0\" ALT=\"ด่วน\">" ;
+}else if ($level==3) {
+	$img_level = "<IMG SRC=\"modules/book/images/level3.gif\" WIDTH=\"20\" HEIGHT=\"11\" BORDER=\"0\" ALT=\"ด่วนมาก\">" ;
+}else if ($level==4) {
+	$img_level = "<IMG SRC=\"modules/book/images/level4.gif\" WIDTH=\"20\" HEIGHT=\"11\" BORDER=\"0\" ALT=\"ด่วนที่สุด\">" ;
+}
+
+// ตรวจสอบไฟล์แนบ
+if($result['bookregis_link']==0){
+$file = mysqli_query($connect,"SELECT id FROM  book_filebook WHERE ref_id='$ref_id' ") ;
+}
+else if($result['bookregis_link']==1 and $result['book_type']==1){
+$file = mysqli_query($connect,"SELECT * FROM  bookregister_send_filebook WHERE ref_id='$ref_id' ") ;
+}
+else if($result['bookregis_link']==1 and $result['book_type']==2){
+$file = mysqli_query($connect,"SELECT * FROM  bookregister_send_filebook_sch WHERE ref_id='$ref_id' ") ;
+}
+$file_num = mysqli_num_rows($file) ;
+if ($file_num==0) {
+	$file_img = "" ;
+}else{
+	$file_img = "<IMG SRC=\"modules/book/images/file1.gif\" WIDTH=\"13\" HEIGHT=\"10\" BORDER=\"0\" ALT=\"มีไฟล์แนบ\">" ;
+}
+
+if($result['secret']==1){
+$secret_txt="<font color='#FF0000'>[ลับ]</font>";
+}
+else{
+$secret_txt="";
+}
+
+?>
+			<tr bgcolor="<?php echo $color;?>">
+					<td align="center"><?php echo $id;?></td>
+					<td align="left">&nbsp;<?php echo $book_no;?>&nbsp;<?php echo $img_level;?></td>
+					<td align="left">&nbsp;<?php echo $subject;?>&nbsp;<?php echo $file_img;?>&nbsp;<?php echo $secret_txt;?></td>
+					<td align="center"><A HREF="javascript:void(0)"
+onclick="window.open('modules/book/main/booksenddetail.php?b_id=<?php echo $id;?>',
+'bookdetail','width=500,height=500,scrollbars')" title="คลิกเพื่อดูรายละเอียด"><span style="text-decoration: none">คลิก</span></A></td>
+					<td><?php echo $signdate;?></td>
+					<td><?php echo $send_date;?></td>
+					<td><?php echo $office_name_ar[$office];?></td>
+			</tr>
+					<?php
+	$M++;
+	$N++;  //*เกี่ยวข้องกับการแยกหน้า
+	}  // end while	
+echo "<tr><td colspan='7'>&nbsp;&nbsp;<FONT COLOR='#009933'><IMG SRC='modules/book/images/file1.gif' WIDTH='16' HEIGHT='16' BORDER='0'>มีไฟล์เอกสาร</FONT></td></tr>";
+echo "</table>";
+}  //end index
+?>
+
+<script>
+function goto_url(val){
+	if(val==0){
+		callfrm("?option=book&task=main/send_mobile");   // page ย้อนกลับ 
+	}else if(val==1){
+	var v2 = document.frm1.subject.value;
+	var v3 = document.frm1.detail.value;
+	var file1 = document.frm1.myfile1.value;
+	var file2 = document.frm1.myfile2.value;
+	var file3 = document.frm1.myfile3.value;
+	var file4 = document.frm1.myfile4.value;
+	var file5 = document.frm1.myfile5.value;
+		
+	var vdfile1 = document.frm1.dfile1.value;
+	var vdfile2 = document.frm1.dfile2.value;
+	var vdfile3 = document.frm1.dfile3.value;
+	var vdfile4 = document.frm1.dfile4.value;
+	var vdfile5 = document.frm1.dfile5.value;
+	
+	var w_group=document.getElementsByName("workgroup");
+	var wg=0;
+	for(i=0;i<w_group.length;i++){
+			if(w_group[i].checked==true){
+			wg=1;
+			}
+	}
+
+          if (wg==0)
+           {
+          alert("กรุณาเลือกผู้ส่ง (จาก)");
+           }
+		   else if (document.frm1.book_no.value=="")
+           {
+          alert("กรุณากรอกเลขที่หนังสือ");
+         	document.frm1.book_no.focus();    
+           }	   
+		   else if (v2.length==0)
+           {
+          alert("กรุณากรอกชื่อเรื่อง");
+         	document.frm1.subject.focus();    
+           }	   
+
+		   else if (v3.length==0)
+           {
+          alert("กรุณากรอกเนื้อหาโดยสรุป");
+         	document.frm1.detail.focus();    
+           }	   
+		   
+		   else if ((file1!="") && (vdfile1=="")) 
+           {
+          alert("กรุณากรอก คำอธิบายไฟล์");
+        	document.frm1.dfile1.focus();    
+           }
+
+		   else if ((file2 !="") && (vdfile2=="")) 
+           {
+          alert("กรุณากรอก คำอธิบายไฟล์");
+      		 document.frm1.dfile2.focus();    
+           }
+		   
+		   else if ((file3!="") && (vdfile3=="")) 
+           {
+          alert("กรุณากรอก คำอธิบายไฟล์");
+       	   document.frm1.dfile3.focus();    
+           }
+		   
+		   else if ((file4 !="") && (vdfile4=="")) 
+           {
+          alert("กรุณากรอก คำอธิบายไฟล์");
+           document.frm1.dfile4.focus();    
+           }
+		   
+		   else if ((file5!="") && (vdfile5=="")) 
+           {
+          alert("กรุณากรอก คำอธิบายไฟล์");
+           document.frm1.dfile5.focus();    
+           }
+
+        else{
+		callfrm("?option=book&task=main/send_mobile&index=4");   //page ประมวลผล
+		}
+	}
+}
+
+</script>
