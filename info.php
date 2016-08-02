@@ -8,5 +8,4 @@ $min = $info['minutes'];
 $sec = $info['seconds'];
 
 echo $current_date = "$date/$month/$year == $hour:$min:$sec";
-echo "คืออะไร";
 ?>
