@@ -1,6 +1,18 @@
 <?php
-include '../../../amssplus_connect.php'; 
+session_start();
+include '../../../database_connect.php'; 
 include 'function.php'; 
+
+$userlogin=$_SESSION['login_user_id'];
+if(isset($_SESSION['role_id'])){
+$user_role_id=mysqli_real_escape_string($connect,$_SESSION['role_id']);
+}else {$user_role_id=""; 
+?>
+<script langquage='javascript'>
+window.location="?option=book2&task=main/roleperson";
+</script>
+<?php
+}
 
 //header("content-type:text/javascript;charset=utf-8");   
 //เช็ค SESSION ผู้เข้าระบบ
@@ -24,6 +36,52 @@ $getref_id=mysqli_real_escape_string($connect,$_GET['id']);
 
 }
 
+$roleid_person=$_SESSION["roleid_person"];
+//หาชื่อบทบาทของบุคลากร
+    $sql_role_person="select * from book2_roleperson where id=?  ";
+    $query_role_person = $connect->prepare($sql_role_person);
+    $query_role_person->bind_param("i", $roleid_person);
+    $query_role_person->execute();
+    $result_qrole_person=$query_role_person->get_result();
+
+    While ($result_role_person = mysqli_fetch_array($result_qrole_person))
+   {
+        $role_id=$result_role_person['role_id']; 
+        $level_dep=$result_role_person['level_dep'];  
+        $look_dep_subdep=$result_role_person['look_dep_subdep'];  
+   
+        if($level_dep=='2' || $level_dep=='4' || $level_dep>='6' && $level_dep<='12' ){
+            $searchorg="book2_department";
+        }else{
+            $searchorg="book2_subdepartment";            
+        }
+//หาชื่อบทบาท
+    $sql_role="select * from book2_role  where id=?  ";
+    $query_role = $connect->prepare($sql_role);
+    $query_role->bind_param("i", $role_id);
+    $query_role->execute();
+    $result_qrole=$query_role->get_result();
+    
+    While ($result_role = mysqli_fetch_array($result_qrole))
+   {
+        $role_id=$result_role['id'];
+        $name_role=$result_role['name'];
+   }
+        
+//หาชื่อหน่วยงาน
+    $sql_dep="select * from $searchorg  where id=?  ";
+    $query_dep = $connect->prepare($sql_dep);
+    $query_dep->bind_param("i", $look_dep_subdep);
+    $query_dep->execute();
+    $result_qdep=$query_dep->get_result();
+    
+    While ($result_dep = mysqli_fetch_array($result_qdep))
+   {
+        $name_predepart=$result_dep['nameprecis'];
+        $name_depart=$result_dep['name'];
+   }
+
+}
 
 
 //$book_status="6";    //กรณีออกเลยแล้วรอส่ง 
@@ -37,16 +95,14 @@ $getref_id=mysqli_real_escape_string($connect,$_GET['id']);
 
  While ($result_booksend = mysqli_fetch_array($result_qbooksend))
    {
-        $booksend_no=$result_booksend['book_no'];
+        $booksend_no=$result_booksend['book_num'];
         $booksend_date=  datesql2show($result_booksend['book_date']);
         $booksend_subject=$result_booksend['book_subject'];
         $booksend_for=$result_booksend['book_for'];
         $booksend_detail=$result_booksend['book_detail'];
         $booksend_comment=$result_booksend['book_comment'];
         $booksend_level=$result_booksend['book_level'];
-        $booksend_from=$result_booksend['book_from'];
-        $sendtoorg=$result_booksend['book_to_nodeid'];
-        $book2other=$result_booksend['book_to'];
+        $booksend_from=$result_booksend['book_fromdepartment'];
         $booksend_comment=$result_booksend['book_comment'];
         $booksend_secret=$result_booksend['book_secret'];
     }
@@ -168,15 +224,15 @@ $getref_id=mysqli_real_escape_string($connect,$_GET['id']);
                                        
 <?php
 
-            //หาสิทธิ์ของผู้ใช้งาน
-                $sql_sanode="select * from book2_sa_node_id where sa_node_id=? ";
+            //หาชื่อหน่วยงานที่ส่ง
+                $sql_sanode="select * from book2_department where id=? ";
                 $query_sanode = $connect->prepare($sql_sanode);
                 $query_sanode->bind_param("s", $booksend_from);
                 $query_sanode->execute();
                 $result_qsanode=$query_sanode->get_result();
                     While ($result_sanode = mysqli_fetch_array($result_qsanode))
                    {
-                            $sa_node_name=$result_sanode['sa_node_name'];
+                            $name_precisdepart=$result_sanode['nameprecis'];
                    }
 ?>
                     
@@ -186,7 +242,7 @@ $getref_id=mysqli_real_escape_string($connect,$_GET['id']);
                             <label for="membookfrom" class="col-sm-2" style="width: 120px" >
                                  จาก</label>
                             <div  class="col-sm-6 text-left" >
-                                <?php echo $sa_node_name;?>
+                                <?php echo $name_precisdepart;?>
                             </div>
                        </div>
                 </div>

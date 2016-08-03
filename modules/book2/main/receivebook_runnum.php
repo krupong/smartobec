@@ -31,7 +31,7 @@ $data = json_decode($_POST['id']);
 //ลงทะเบียนรับหนังสือ
 $receive_status="1";
 //ตารางเลขหนังสือรับ
-$book_type="2";
+$book_type="1";
 
 
                             //หากลุ่ม บทบาท
@@ -66,14 +66,29 @@ $countarray= count($data);
                                $j=0;
                                 for($i=0;$i<$countarray;$i++)
                                {
-                                    $bookrefid=$data[$i];
+                                        $booksendid=$data[$i];
+                                    //แสดงหนังสือรอส่ง
+                                        $sql_booksendst="select * from book2_system where id=? ";
+                                        $query_booksendst = $connect->prepare($sql_booksendst);
+                                        $query_booksendst->bind_param("s", $booksendid);
+                                        $query_booksendst->execute();
+                                        $result_qbooksendst=$query_booksendst->get_result();
+
+                                     While ($result_booksendst = mysqli_fetch_array($result_qbooksendst))
+                                       {
+                                            $bookrefid=$result_booksendst['book_refid'];
+                                        }
+                                   // $bookrefid=$data[$i];
+                                   // $bookrefid=$data[$i];
+                                   // $bookrefid=$data[$i];
+                                   // $bookrefid=$data[$i];
 //echo $sendidorg."<BR>";
                                 $bookno=$bookno+1;
 
                     // อัพเดต สถานะหนังสือ    
-                    $sql_bookreceiveupdate = "update book2_system set receiver_group=? , receiver_officer=? , receiver_role=? ,receiver_year=? , receiver_date=? , receiver_no=? , receiver_status=? where book_refid=? AND receiver_department=?  ";
+                    $sql_bookreceiveupdate = "update book2_system set receiver_group=? , receiver_officer=? , receiver_role=? ,receiver_year=? , receiver_date=? , receiver_no=? , receiver_status=? where id=?  ";
                    if ($dbquery_bookreceiveupdate = $connect->prepare($sql_bookreceiveupdate)) {
-                   $dbquery_bookreceiveupdate->bind_param("sssssssss",$grouprole,$userlogin,$grouprole,$todayyear,$roleid,$bookno,$receive_status,$bookrefid,$role_iddepart);
+                   $dbquery_bookreceiveupdate->bind_param("ssssssss",$grouprole,$userlogin,$roleid,$todayyear,$todaydatetime,$bookno,$receive_status,$booksendid);
                    $dbquery_bookreceiveupdate->execute();
                    $result_bookreceiveupdate=$dbquery_bookreceiveupdate->get_result();
                    }

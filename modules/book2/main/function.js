@@ -140,7 +140,7 @@ function groupcheckreceive(){
                                             //alert("#showresult");
                                             $(".result").html(data);
                                         });
-	return false;
+        return false;
         }
         
   //เช็คหนังสือราชการที่เคยรับ
@@ -220,4 +220,107 @@ function session_role(roleid_person){
 }
 
                  
+//ส่งคืนหนังสือราชการออก
+function return_sendbook(){
+	if(confirm("กดตกลงเพื่อยืนยันการส่งคืน")){
+            
+                var idArray = [];
+                $("input[name='checkgroupreceive[]']").each( function () {
+                                if($(this).prop('checked') == true){
+                                    idArray.push($(this).val());
+                                    }
+                            });
+                 //var returncomment = $("input[name='returncomment']");      
+                 var returncomment = document.getElementById("returncomment").value;
+        $.post("./modules/book2/main/receivebook_return.php", {id: JSON.stringify(idArray),commentrt :returncomment} , function(data){
+                                            // Display the returned data in browser
+                                            //console.log(data);
+                                            //alert("#showresult");
+                                            //$(".result").html(data);
+                                            alert(data);
+                                            location.reload();
+                                        });                  
+            
+                /*	$.ajax({                    
+			type:"POST",
+			url:"./modules/book2/main/process.php",
+                                                data:$("#return_sendbookcomment").serialize(),
+                                                /*data:{
+                                                        returnbook_refid:id,
+                                                        senderrole:senderrole,
+                                                        sender_officer:senderofficer,
+                                                        comment:comment
+                                                    },
+                                                   
+			success:function(data){
+				alert(data);
+				location.reload();
+			}
+		});
+                */
+	}
+	return false;
+        }
 
+//ส่งคืนหนังสือราชการออก
+function finish_sendbook(){
+	if(confirm("กดตกลงเพื่อยืนยันการยุติหนังสือราชการ")){
+            
+                var idArray = [];
+                $("input[name='checkgroupreceive[]']").each( function () {
+                                if($(this).prop('checked') == true){
+                                    idArray.push($(this).val());
+                                    }
+                            });
+                 //var returncomment = $("input[name='returncomment']");      
+                 var finishcomment = document.getElementById("finishcomment").value;
+        $.post("./modules/book2/main/receivebook_finish.php", {id: JSON.stringify(idArray),commentfn :finishcomment} , function(data){
+                                            // Display the returned data in browser
+                                            //console.log(data);
+                                            //alert("#showresult");
+                                            //$(".result").html(data);
+                                            alert(data);
+                                            location.reload();
+                                        });                  
+            
+                /*	$.ajax({                    
+			type:"POST",
+			url:"./modules/book2/main/process.php",
+                                                data:$("#return_sendbookcomment").serialize(),
+                                                /*data:{
+                                                        returnbook_refid:id,
+                                                        senderrole:senderrole,
+                                                        sender_officer:senderofficer,
+                                                        comment:comment
+                                                    },
+                                                   
+			success:function(data){
+				alert(data);
+				location.reload();
+			}
+		});
+                */
+	}
+	return false;
+        }
+
+//ลงทะเบียนหนังสือจากกระดาษ
+function receive_paperbook(){
+	$.ajax({
+		type:"POST",
+		url:"./modules/book2/main/receive_paper_process.php",
+		data:$("#add_department_form").serialize(),
+		success:function(data){
+			
+			//close modal
+			//$(".close").trigger("click");
+			
+			//show result
+			alert(data);
+			
+			//reload page
+			location.reload();
+		}
+	});
+	return false;
+}
