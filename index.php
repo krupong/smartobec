@@ -72,17 +72,17 @@ if($_GET["task"]!=""){
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
   <!-- daterange picker -->
-  <link rel="stylesheet" href="./adminlte233/plugins/daterangepicker/daterangepicker-bs3.css">
+  <!--<link rel="stylesheet" href="./adminlte233/plugins/daterangepicker/daterangepicker-bs3.css">
   <!-- bootstrap datepicker -->
-  <link rel="stylesheet" href="./adminlte233/plugins/datepicker/datepicker3.css">
+  <!--<link rel="stylesheet" href="./adminlte233/plugins/datepicker/datepicker3.css">
   <!-- iCheck for checkboxes and radio inputs -->
-  <link rel="stylesheet" href="./adminlte233/plugins/iCheck/all.css">
+  <!--<link rel="stylesheet" href="./adminlte233/plugins/iCheck/all.css">
   <!-- Bootstrap Color Picker -->
-  <link rel="stylesheet" href="./adminlte233/plugins/colorpicker/bootstrap-colorpicker.min.css">
+  <!--<link rel="stylesheet" href="./adminlte233/plugins/colorpicker/bootstrap-colorpicker.min.css">
   <!-- Bootstrap time Picker -->
-  <link rel="stylesheet" href="./adminlte233/plugins/timepicker/bootstrap-timepicker.min.css">
+  <!--<link rel="stylesheet" href="./adminlte233/plugins/timepicker/bootstrap-timepicker.min.css">
   <!-- Select2 -->
-  <link rel="stylesheet" href="./adminlte233/plugins/select2/select2.min.css">
+  <!--<link rel="stylesheet" href="./adminlte233/plugins/select2/select2.min.css">
   <!-- Theme style -->
   <link rel="stylesheet" href="./adminlte233/dist/css/AdminLTE.min.css">
   <!-- AdminLTE Skins. Choose a skin from the css/skins
@@ -101,42 +101,42 @@ if($_GET["task"]!=""){
   <!-- Bootstrap Confirmation -->
   <script src="./bootstrap-3.3.5-dist/js/bootstrap-confirmation.min.js"></script>
   <!--Bootstrap selectpicker -->
-  <script src="./bootstrap-3.3.5-dist/js/bootstrap-select.min.js"></script>
-  <link href="./bootstrap-3.3.5-dist/css/bootstrap-select.min.css" rel="stylesheet" media="screen">
+  <!--<script src="./bootstrap-3.3.5-dist/js/bootstrap-select.min.js"></script>
+  <!--<link href="./bootstrap-3.3.5-dist/css/bootstrap-select.min.css" rel="stylesheet" media="screen">-->
   <!-- AdminLTE template -->
   <!-- jQuery 2.2.0 -->
   <!--<script src="adminlte233/plugins/jQuery/jQuery-2.2.0.min.js"></script>-->
   <!-- Select2 -->
-  <script src="./adminlte233/plugins/select2/select2.full.min.js"></script>
+  <!--<script src="./adminlte233/plugins/select2/select2.full.min.js"></script>-->
   <!-- InputMask -->
-  <script src="./adminlte233/plugins/input-mask/jquery.inputmask.js"></script>
-  <script src="./adminlte233/plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
-  <script src="./adminlte233/plugins/input-mask/jquery.inputmask.extensions.js"></script>
+  <!--<script src="./adminlte233/plugins/input-mask/jquery.inputmask.js"></script>-->
+  <!--<script src="./adminlte233/plugins/input-mask/jquery.inputmask.date.extensions.js"></script>-->
+  <!--<script src="./adminlte233/plugins/input-mask/jquery.inputmask.extensions.js"></script>-->
   <!-- date-range-picker -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
-  <script src="./adminlte233/plugins/daterangepicker/daterangepicker.js"></script>
+  <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>-->
+  <!--<script src="./adminlte233/plugins/daterangepicker/daterangepicker.js"></script>-->
   <!-- bootstrap datepicker -->
-  <script src="./adminlte233/plugins/datepicker/bootstrap-datepicker.js"></script>
+  <!--<script src="./adminlte233/plugins/datepicker/bootstrap-datepicker.js"></script>-->
   <!-- bootstrap color picker -->
-  <script src="./adminlte233/plugins/colorpicker/bootstrap-colorpicker.min.js"></script>
+  <!--<script src="./adminlte233/plugins/colorpicker/bootstrap-colorpicker.min.js"></script>-->
   <!-- bootstrap time picker -->
-  <script src="./adminlte233/plugins/timepicker/bootstrap-timepicker.min.js"></script>
+  <!--<script src="./adminlte233/plugins/timepicker/bootstrap-timepicker.min.js"></script>-->
   <!-- SlimScroll 1.3.0 -->
-  <script src="./adminlte233/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+  <!--<script src="./adminlte233/plugins/slimScroll/jquery.slimscroll.min.js"></script>-->
   <!-- iCheck 1.0.1 -->
-  <script src="./adminlte233/plugins/iCheck/icheck.min.js"></script>
+  <!--<script src="./adminlte233/plugins/iCheck/icheck.min.js"></script>-->
   <!-- FastClick -->
-  <script src="./adminlte233/plugins/fastclick/fastclick.js"></script>
+  <!--<script src="./adminlte233/plugins/fastclick/fastclick.js"></script>-->
   <!-- AdminLTE App -->
   <script src="./adminlte233/dist/js/app.min.js"></script>
   <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-  <script src="./adminlte233/dist/js/pages/dashboard.js"></script>
+  <!--<script src="./adminlte233/dist/js/pages/dashboard.js"></script>-->
   <!-- AdminLTE for demo purposes -->
-  <script src="./adminlte233/dist/js/demo.js"></script>
+  <!--<script src="./adminlte233/dist/js/demo.js"></script>-->
   <!-- bootstrap confirmation -->
-  <script src="./bootstrap-3.3.5-dist/js/bootstrap-confirmation.min.js"></script>
+  <!--<script src="./bootstrap-3.3.5-dist/js/bootstrap-confirmation.min.js"></script>-->
   <!--Bootstrap selectpicker -->
-  <script src="./bootstrap-3.3.5-dist/js/bootstrap-select.min.js"></script>
+  <!--<script src="./bootstrap-3.3.5-dist/js/bootstrap-select.min.js"></script>-->
   <!-- Sweet Alert -->
   <script src="./assets/sweetalert/dist/sweetalert.min.js"></script>
   <link rel="stylesheet" type="text/css" href="./assets/sweetalert/dist/sweetalert.css">
