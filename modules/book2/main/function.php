@@ -358,40 +358,6 @@ class Database2 {
 
                 }	
 	
-	//function ลบไฟล์แนบ
-	public function detailbook($book_refid){
-		
-                                include '../../../database_connect.php';
-		//$db = $this->connect();
-		    $sql_bookfile="SELECT * FROM book2_file where id=? ";
-                                    $query_bookfile = $connect->prepare($sql_bookfile);
-                                    $query_bookfile->bind_param("i", $id);
-                                    $query_bookfile->execute();
-                                    $result_qbookfile=$query_bookfile->get_result();
-                                        While ($result_bookfile = mysqli_fetch_array($result_qbookfile))
-                                       {
-                                           $delfileupload="../../../uploadsmy/".$result_bookfile["file_path"];  
-                                       }
-                                
-		$del_fileupload = $connect->prepare("DELETE  FROM book2_file WHERE id = ?");
-		
-		$del_fileupload->bind_param("i",$id);
-		
-		if(!$del_fileupload->execute()){
-			
-			echo $connect->error;
-			
-		}else{
-                                            //หาไฟล์ว่ามีรึเปล่า
-                                            if( file_exists($delfileupload) )
-                                                {
-                                                //echo "มีไฟล์";
-                                                //ลบไฟล์
-                                                unlink($delfileupload);
-                                                }else{echo "ไม่มีไฟล์ ";}
-			echo "ลบข้อมูลเรียบร้อย";
-		}
-	}
 
 	//function เพื่ม หน่วยงาน
 	public function add_department($data){

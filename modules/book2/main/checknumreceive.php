@@ -16,24 +16,57 @@ window.location="?option=book2&task=main/roleperson";
 //เช็ค SESSION ผู้เข้าระบบ
 $userlogin=$_SESSION['login_user_id'];
 //echo $userlogin;
-//บทบาทที่เข้ามาด้วย
-//หาสิทธิ์ของผู้ใช้งาน
-    $sql_roleuser="select * from book2_roleuser where person_id=? order by sa_node_id ASC";
-    $query_roleuser = $connect->prepare($sql_roleuser);
-    $query_roleuser->bind_param("s", $userlogin);
-    $query_roleuser->execute();
-    $result_qroleuser=$query_roleuser->get_result();
-        While ($result_roleuser = mysqli_fetch_array($result_qroleuser))
-       {
-            $roleuser_sa_node_id=$result_roleuser['sa_node_id'];
-        }
+$roleid_person=$_SESSION["roleid_person"];
+//หาชื่อบทบาทของบุคลากร
+    $sql_role_person="select * from book2_roleperson where id=?  ";
+    $query_role_person = $connect->prepare($sql_role_person);
+    $query_role_person->bind_param("i", $roleid_person);
+    $query_role_person->execute();
+    $result_qrole_person=$query_role_person->get_result();
 
+    While ($result_role_person = mysqli_fetch_array($result_qrole_person))
+   {
+        $role_id=$result_role_person['role_id']; 
+        $level_dep=$result_role_person['level_dep'];  
+        $look_dep_subdep=$result_role_person['look_dep_subdep'];  
+   
+        if($level_dep=='2' || $level_dep=='4' || $level_dep>='6' && $level_dep<='12' ){
+            $searchorg="book2_department";
+        }else{
+            $searchorg="book2_subdepartment";            
+        }
+//หาชื่อบทบาท
+    $sql_role="select * from book2_role  where id=?  ";
+    $query_role = $connect->prepare($sql_role);
+    $query_role->bind_param("i", $role_id);
+    $query_role->execute();
+    $result_qrole=$query_role->get_result();
+    
+    While ($result_role = mysqli_fetch_array($result_qrole))
+   {
+        $role_id=$result_role['id'];
+        $name_role=$result_role['name'];
+   }
+        
+//หาชื่อหน่วยงาน
+    $sql_dep="select * from $searchorg  where id=?  ";
+    $query_dep = $connect->prepare($sql_dep);
+    $query_dep->bind_param("i", $look_dep_subdep);
+    $query_dep->execute();
+    $result_qdep=$query_dep->get_result();
+    
+    While ($result_dep = mysqli_fetch_array($result_qdep))
+   {
+        $name_predepart=$result_dep['nameprecis'];
+   }
+
+}
 //ตรวจสอบการ นำเข้าข้อมูล
 $data = $_POST['id'];
 if($data!=""){  //ตรวจสอบค่าว่าง
-
+        
 //ลงทะเบียนรับหนังสือ
-$receive_status="1";
+$receive_status=" and (receiver_status=1 or receiver_status=2) ";
 //ตารางเลขหนังสือรับ
 $book_table="2";
 
@@ -42,9 +75,9 @@ $book_table="2";
     
 
 //หาหนังสือรับใหม่
-    $sql_booksystem="select * from book2_system where  receiver=? and (receiver_status=1 or receiver_status=2) order by  sender_date DESC ";
+    $sql_booksystem="select * from book2_system where  receiver_department=?  and (receiver_status=1 or receiver_status=2)  order by  receiver_no DESC ";
     $query_booksystem = $connect->prepare($sql_booksystem);
-    $query_booksystem->bind_param("s", $roleuser_sa_node_id);
+    $query_booksystem->bind_param("s", $look_dep_subdep);
     $query_booksystem->execute();
     $result_qbooksystem=$query_booksystem->get_result();
     
@@ -53,31 +86,18 @@ $book_table="2";
     While ($result_booksystem = mysqli_fetch_array($result_qbooksystem))
    {
         $book2system_book_refid=$result_booksystem['book_refid']; 
-        //echo '$book2system_book_refid ='.$book2system_book_refid."<BR>";
-        
-        //$showdata="'%".$data."%'";
-        
+        $book2system_receiver_no=$result_booksystem['receiver_no']; 
+        $book2system_receiver_year=$result_booksystem['receiver_year']; 
+
         //แสดงหนังสือรอส่ง
-        $sql = "select * from book2_send where book_refid='$book2system_book_refid' and book_no like '%$data%'";
+        $sql = "select * from book2_send where book_refid='$book2system_book_refid' and book_num like '%$data%'";
         $dbquery = mysqli_query($connect,$sql);
-        //echo $sql;
         While ($result_booksend = mysqli_fetch_array($dbquery)){
 
-/*
-        $sql_booksend="select * from book2_send where book_refid=? and book_no like CONCAT(‘%’,?,’%’) ";
-            $query_booksend = $connect->prepare($sql_booksend);
-            $query_booksend->bind_param("ss", $book2system_book_refid,$data);
-            $query_booksend->execute();
-            $result_qbooksend=$query_booksend->get_result();
-
-         While ($result_booksend = mysqli_fetch_array($result_qbooksend))
-           {
-*/
-//             echo " 666 <BR>";
-                $booksend_no=$result_booksend['book_no'];
+                $booksend_no=$result_booksend['book_num'];
                 $booksend_date=$result_booksend['book_date'];
                 $booksend_subject=$result_booksend['book_subject'];
-                $booksend_from=$result_booksend['book_from'];
+                $booksend_from=$result_booksend['book_fromdepartment'];
 
             $findbookreceive="1";
             ?>
@@ -85,7 +105,7 @@ $book_table="2";
         
         <label><span class="glyphicon glyphicon-check"  aria-hidden="true"></span><a href="#" onclick="showdetailreceived('<?php echo $book2system_book_refid;?>')" >
             <?php echo $booksend_no;?> ลว  <?php echo $booksend_date; ?><BR>
-            เลขรับ <?php echo $booksend_no;?> เมื่อวันที่ <?php echo $booksend_date; ?><BR>
+            เลขรับ <?php echo $book2system_receiver_no;?>/<?php echo yeareng2thshort($book2system_receiver_year); ?> รับวันที่ <?php echo $booksend_date; ?><BR>
                 </a></label>
         
         </div>                       
@@ -95,6 +115,7 @@ $book_table="2";
         }
  }
  if($findbookreceive==0){
+
      ?>
         <div  class="row container table-hover " style='margin-top:10px; '>
         

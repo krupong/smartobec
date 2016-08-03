@@ -65,5 +65,6 @@ $process = new Database2();
 		//รับข้อมูลจาก FORM ส่งไปที่ Method Session
 		$process->session_roleid_person($_POST['session_roleid_person']);
 	}
-        
+
+       
 ?>
