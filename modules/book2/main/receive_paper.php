@@ -1,4 +1,6 @@
 <?php
+//Session Login
+$userlogin=$_SESSION['login_user_id'];
 if(isset($_SESSION['role_id'])){
 $user_role_id=mysqli_real_escape_string($connect,$_SESSION['role_id']);
 }else {$user_role_id=""; 
@@ -8,6 +10,53 @@ window.location="?option=book2&task=main/roleperson";
 </script>
 <?php
 }
+
+//หาสิทธิ์ของผู้ใช้งาน
+$roleid_person=$_SESSION["roleid_person"];
+//หาชื่อบทบาทของบุคลากร
+    $sql_role_person="select * from book2_roleperson where id=?  ";
+    $query_role_person = $connect->prepare($sql_role_person);
+    $query_role_person->bind_param("i", $roleid_person);
+    $query_role_person->execute();
+    $result_qrole_person=$query_role_person->get_result();
+
+    While ($result_role_person = mysqli_fetch_array($result_qrole_person))
+   {
+        $role_id=$result_role_person['role_id']; 
+        $level_dep=$result_role_person['level_dep'];  
+        $look_dep_subdep=$result_role_person['look_dep_subdep'];  
+        $orgtb=$result_role_person['orgtb']; 
+   }
+        if($level_dep=='2' || $level_dep=='4' || $level_dep>='6' && $level_dep<='12' ){
+            $searchorg="book2_department";
+        }else{
+            $searchorg="book2_subdepartment";            
+        }
+//หาชื่อบทบาท
+    $sql_role="select * from book2_role  where id=?  ";
+    $query_role = $connect->prepare($sql_role);
+    $query_role->bind_param("i", $role_id);
+    $query_role->execute();
+    $result_qrole=$query_role->get_result();
+    
+    While ($result_role = mysqli_fetch_array($result_qrole))
+   {
+        $role_id=$result_role['id'];
+        $name_role=$result_role['name'];
+   }
+        
+//หาชื่อหน่วยงาน
+    $sql_dep="select * from $searchorg  where id=?  ";
+    $query_dep = $connect->prepare($sql_dep);
+    $query_dep->bind_param("i", $look_dep_subdep);
+    $query_dep->execute();
+    $result_qdep=$query_dep->get_result();
+    
+    While ($result_dep = mysqli_fetch_array($result_qdep))
+   {
+        $name_predepart=$result_dep['nameprecis'];
+   }
+
 ?>
 
 <html>
@@ -45,6 +94,7 @@ window.location="?option=book2&task=main/roleperson";
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body  container">
+                    <form name="receive_frompaper" data-toggle="validator" role="form" method="POST" action="?option=book2&task=main/receive_paper_process">
                     <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="bookno" class="col-sm-2" style="width: 140px" >
@@ -53,7 +103,7 @@ window.location="?option=book2&task=main/roleperson";
                                 <input type="text" class="form-control" id="bookno" placeholder="กรุณากรอกเลขที่หนังสือ" name="bookno" required>
                             </div>
                              <div  class="col-sm-2 text-left" >
-                                 <button type="submit" class="btn btn-success"  data-toggle="modal" data-target="#checknumreceive" onclick="checknumreceive();" ><span class="glyphicon glyphicon-check" aria-hidden="true"></span> ตรวจสอบเลขที่หนังสือ</button>
+                                 <button type="button" class="btn btn-success"  data-toggle="modal" data-target="#checknumreceive" onclick="checknumreceive();" ><span class="glyphicon glyphicon-check" aria-hidden="true"></span> ตรวจสอบเลขที่หนังสือ</button>
                             </div>
                        </div>
                 </div>
@@ -70,12 +120,10 @@ window.location="?option=book2&task=main/roleperson";
                             </div>
                             <div class="modal-body" align="left">
 
-                                <div class="col-md-4 result"></div>
-                                
+                                <div class="col-md-4 result"></div>                                
                                 <div class="col-md-8 detail"></div>
                             </div>
-                        	<div class="modal-footer">
-                                    
+                        	<div class="modal-footer">                                    
                                 </div>
       
                       </div>
@@ -207,142 +255,30 @@ $today=date("d-m-Y");
                        </div>
                 </div>
 
-                <div class="row" style="padding-bottom: 5px;padding-top: 10px;">
-                    <div class="col-sm-8">
+                  <div class="row text-center" style="padding-bottom: 5px;padding-top: 15px;">
                         <div class="form-group">
-                                    <div class="container"><h4>การดำเนินการ</h4></div>
-
-                                    <div id="exTab2" class="" >	
-                                    <ul class="nav nav-pills">
-                                        <li class="active"><a  href="#1" data-toggle="tab">ลงทะเบียนรับและส่ง</a>
-                                        </li>
-                                        <li><a href="#2" data-toggle="tab">ลงทะเบียนรับ</a>
-                                        </li>
-                                    </ul>
-
-                                        <div class="tab-content">
-                                                                <div class=" tab-pane active" id="1">
-                                                                    
-                    <div class="row" style="padding-bottom: 5px;padding-top: 20px;">
-                        <div class="form-group">
-                            <label for="bookno" class="col-sm-1 text-right"  >
-                                <input type="checkbox" id="membookcomment" name="membookcomment" class="flat-green " value="1" ></label>
-                            <div  class="col-sm-9 text-left" >
-<?php
-//หาชื่อหน่วยงาน
-    $sql_person_name="select * from person_main where status=0 ";
-    $query_person_name = $connect->prepare($sql_person_name);
-    //$query_person_name->bind_param("i", $user_departid);
-    $query_person_name->execute();
-    $result_qperson_name=$query_person_name->get_result();
-?>
-<select class="select2up form-control" multiple="multiple" data-placeholder="กรุณาเลือกเพื่อส่งผู้บริหาร" style="width: 100%;" >
-<?php
-    While ($result_person_name = mysqli_fetch_array($result_qperson_name))
-   {
-    echo "<option value=".$result_person_name['person_id'].">".$result_person_name['name']." ".$result_person_name['surname']."</option>";
-    }
-?>
-</select>
-                            </div>
-                             <div  class="col-sm-1 text-left" >
-                                 <button type="button" class="btn btn-danger clearselect2up"  ><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                            </div>
+                            <button type="submit" id="receivebuttongroup" class="btn btn-info" style="margin: 8px;"  ><span class="glyphicon glyphicon-saved" ></span> ลงทะเบียนรับหนังสือราชการ</button>
                        </div>
-                </div>
-                                                                    
-                    <div class="row" style="padding-bottom: 5px;">
-                        <div class="form-group">
-                            <label for="bookno" class="col-sm-1 text-right"  >
-                                <input type="checkbox" id="membookcomment" name="membookcomment" class="flat-green " value="1" ></label>
-                            <div  class="col-sm-9 text-left" >
-<?php
-//หาชื่อหน่วยงาน
-    $sql_person_name="select * from person_main where status=0 ";
-    $query_person_name = $connect->prepare($sql_person_name);
-    //$query_person_name->bind_param("i", $user_departid);
-    $query_person_name->execute();
-    $result_qperson_name=$query_person_name->get_result();
-?>
-<select class="select2up form-control" multiple="multiple" data-placeholder="กรุณาเลือกเพื่อส่งกลุ่มภารกิจ" style="width: 100%;" >
-<?php
-    While ($result_person_name = mysqli_fetch_array($result_qperson_name))
-   {
-    echo "<option value=".$result_person_name['person_id'].">".$result_person_name['name']." ".$result_person_name['surname']."</option>";
-    }
-?>
-</select>
-                            </div>
-                             <div  class="col-sm-1 text-left" >
-                                 <button type="button" class="btn btn-danger clearselect2up"  ><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                            </div>
-                       </div>
-                </div>
-                                                                    
-                    <div class="row" style="padding-bottom: 5px;">
-                        <div class="form-group">
-                            <label for="bookno" class="col-sm-1 text-right"  >
-                                <input type="checkbox" id="membookcomment" name="membookcomment" class="flat-green " value="1" ></label>
-                            <div  class="col-sm-9 text-left" >
-<?php
-//หาชื่อหน่วยงาน
-    $sql_person_name="select * from person_main where status=0 ";
-    $query_person_name = $connect->prepare($sql_person_name);
-    //$query_person_name->bind_param("i", $user_departid);
-    $query_person_name->execute();
-    $result_qperson_name=$query_person_name->get_result();
-?>
-<select class="select2up form-control" multiple="multiple" data-placeholder="กรุณาเลือกเพื่อส่งบุคคล" style="width: 100%;" >
-<?php
-    While ($result_person_name = mysqli_fetch_array($result_qperson_name))
-   {
-    echo "<option value=".$result_person_name['person_id'].">".$result_person_name['name']." ".$result_person_name['surname']."</option>";
-    }
-?>
-</select>
-                            </div>
-                             <div  class="col-sm-1 text-left" >
-                                 <button type="button" class="btn btn-danger clearselect2up"  ><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
-                            </div>
-                       </div>
-                </div>
-                                                                    
-               <div class="row" style="padding-bottom: 5px;">
-                        <div class="form-group text-center">
-                                    <button type="button" class="btn btn-success" ><span class="glyphicon glyphicon-forward" aria-hidden="true"></span>ลงทะเบียนรับและส่ง</button>  
-                        </div>
-                </div>
-                                                                </div><!-- div tab-pane active id=1 -->
-                                            
-                                                                    <div class="tab-pane" id="2">
-                                                                        <div class="row" style="padding-bottom: 5px;padding-top: 20px;">
-                                                                                <div class="form-group">
-                                                                                    <label for="bookreceiveno" class="col-sm-2" style="width: 140px;color:#000000" > เลขหนังสือรับ</label>
-                                                                                    <div  class="col-sm-5 text-left" >
-                                                                                        <input type="text" class="form-control" id="bookreceiveno" placeholder="ข้อมูลเลขหนังสือรับ" name="bookreceiveno" required>
-                                                                                    </div>
-                                                                               </div>
-                                                                        </div>
-                                                                        <div class="row" style="padding-bottom: 5px;">
-                                                                                <div class="form-group">
-                                                                                    <label for="bookreceivedate" class="col-sm-2" style="width: 140px;color:#000000" > วันที่รับ</label>
-                                                                                    <div  class="col-sm-5 text-left" >
-                                                                                        <input type="text" class="form-control" id="bookreceivedate" placeholder="ข้อมูลวันที่รับหนังสือ" name="bookreceivedate" required>
-                                                                                    </div>
-                                                                               </div>
-                                                                        </div>
-                                                                    <div align="center"><button type="button" class="btn btn-warning" ><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> ลงทะเบียนรับ</button></div>   
-                                                                    </div><!-- div tab-pane active id=2 -->
+                  </div> 
 
-                                                            </div>
-                                      </div>
-
-
-                        </div>
-                    </div>
-                </div>
-                    
-                    
+                <!-- Get Process -->
+                <?php
+                $timestamp = mktime(date("H"), date("i"),date("s"), date("m") ,date("d"), date("Y"))  ;	
+                //timestamp เวลาปัจจุบัน 
+                $rand_number=rand();
+                $ref_id = $timestamp."x".$rand_number;
+                ?>
+                
+                <input type="hidden" name="bookrefid" value="<?php echo $ref_id;?>" />
+                <input type="hidden" name="bookstatus" value="1" />
+                <input type="hidden" name="inputpermistype" value="rcpaperbook" />
+                <input type="hidden" name="inputprocess" value="inputprocess" />
+                <input type="hidden" name="inputsender" value="<?php echo $userlogin;?>" />
+                <input type="hidden" name="bookfromrole" value="<?php echo $user_role_id;?>" />
+                <input type="hidden" name="bookfromorgtb" value="<?php echo $orgtb;?>" />
+                <input type="hidden" name="booktype" value="1" />
+                
+                    </form>
                 </div>
                 <!-- /.box-body -->
               </div>

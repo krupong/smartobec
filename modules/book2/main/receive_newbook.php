@@ -93,6 +93,9 @@ $roleid_person=$_SESSION["roleid_person"];
         .ems1 { 
           color: #000099 ;
         }
+        .returnbook { 
+          color: #ff0000 ;
+        }
     </style>
 
     </head>
@@ -132,11 +135,12 @@ $roleid_person=$_SESSION["roleid_person"];
                     </thead>
                     <tbody>
 <?php
-//สถานะหนังสือ  0=ยังไม่รับ 1=ลงรับแล้ว 2=ส่งต่อ 3=ส่งผ่าน 4=ส่งกลับ 5=ยุติเรื่อง
+//สถานะหนังสือ  0=ยังไม่รับ 1=ลงรับแล้ว 2=ส่งต่อ 3=ส่งผ่าน 4=ส่งกลับ 5=ยุติเรื่อง  12=ส่งคืน
     $receive_status_no="0";
+    $receive_status_return=" or receiver_status='12' ";
 
 //หาหนังสือรับใหม่
-    $sql_booksystem="select * from book2_system where receiver_department=? and receiver_status=? order by  sender_date DESC ";
+    $sql_booksystem="select * from book2_system where receiver_department=? and ( receiver_status=? $receive_status_return ) order by  sender_date DESC ";
     $query_booksystem = $connect->prepare($sql_booksystem);
     $query_booksystem->bind_param("si", $look_dep_subdep,$receive_status_no);
     $query_booksystem->execute();
@@ -154,6 +158,7 @@ $roleid_person=$_SESSION["roleid_person"];
         $book2system_sender_date=$result_booksystem['sender_date']; 
         $book2system_sender_department=$result_booksystem['sender_department']; 
         $book2system_book_type=$result_booksystem['book_type']; 
+        $book2system_returnfrom=$result_booksystem['sender_returnfrom']; 
 
         
         //แสดงหนังสือรอส่ง
@@ -174,8 +179,25 @@ $roleid_person=$_SESSION["roleid_person"];
                 $booksend_fromdepartment=$result_booksend['book_fromdepartment'];
                 $booksend_level=$result_booksend['book_level'];
                 $booksend_secret=$result_booksend['book_secret'];
-
             }
+
+//เช็คสถานะส่งคืน แสดงสัญลักษณ์    
+   $book2systemrt_returncomment="";     
+if($result_booksystem['receiver_status']=="12"){
+    //ค้นหาเหตุผลการส่งคืน
+    $sql_booksystemrt="select receiver_comment from book2_system where id=?  ";
+    $query_booksystemrt = $connect->prepare($sql_booksystemrt);
+    $query_booksystemrt->bind_param("s",$book2system_returnfrom);
+    $query_booksystemrt->execute();
+    $result_qbooksystemrt=$query_booksystemrt->get_result();
+        While ($result_booksystemrt = mysqli_fetch_array($result_qbooksystemrt))
+   {
+        $book2systemrt_returncomment=$result_booksystemrt['receiver_comment']; 
+   }
+     //ถ้าส่งคืนให้แสดงหน่วยงานที่ส่งมาคืน
+    $booksend_fromdepartment=$book2system_sender_department;
+    $showreturn_icon="<a title='".$book2systemrt_returncomment."'><span class='glyphicon glyphicon-repeat returnbook' style='font-size: 0.8em;' ></span></a> ";
+    }else{$showreturn_icon="";}
 
     //หาชื่อหน่วยงานจากโหนด
         $sql_sanodefrom="select * from book2_department where id=?";
@@ -214,17 +236,33 @@ $roleid_person=$_SESSION["roleid_person"];
             $classcolor="ems1";
         }
 
-        ?>
+//เช็คไฟล์แนบ แสดงสัญลักษณ์    
+   $showfile_icon="";     
+    //นับจำนวนไฟล์แนบ
+    $sql_bookfile="select count(id) as countfile from book2_file where book_refid=?  ";
+    $query_bookfile = $connect->prepare($sql_bookfile);
+    $query_bookfile->bind_param("s",$book2system_book_refid);
+    $query_bookfile->execute();
+    $result_qbookfile=$query_bookfile->get_result();
+        While ($result_bookfile = mysqli_fetch_array($result_qbookfile))
+   {
+        $bookfilecount=$result_bookfile['countfile']; 
+   }
+   if($bookfilecount>0){
+    $showfile_icon="<a title='มีไฟล์แนบ'><span class='glyphicon glyphicon-paperclip' style='font-size: 0.8em;' ></span></a> ";
+    }else{$showfile_icon="";}
+
+    ?>
                       <tr>
-                          <td><input type="checkbox"  name="checkgroupreceive[]" class="checkbox1"  value="<?php echo $book2system_book_refid;?>" onclick="check(this)"></td>
+                          <td><input type="checkbox"  name="checkgroupreceive[]" class="checkbox1"  value="<?php echo $book2system_id;?>" onclick="check(this)"></td>
                         <td><?php echo $i;?></td>
                         <td><?php echo $booksend_num; ?></td>
                         <td><?php echo $booksend_date; ?></td>
-                        <td> <?php echo $booksend_subject; ?></td>
+                        <td> <?php echo $showreturn_icon.$showfile_icon.$booksend_subject; ?></td>
                         <td> <?php echo $sanodefrom_nameprecis; ?></td>
                         <td> <?php echo $book2system_sender_date; ?></td>
                         <td> 
-                            <a href="#detailbook<?php echo $book2system_book_refid; ?>" data-toggle="modal" onclick="detailbook('<?php echo $book2system_book_refid;?>');" ><span class="glyphicon glyphicon-list-alt <?php echo $classcolor;?>" style="font-size: 1.2em;" ></span></a>
+                            <a href="#detailbook<?php echo $book2system_id; ?>" data-toggle="modal" onclick="detailbook('<?php echo $book2system_id;?>');" ><span class="glyphicon glyphicon-list-alt <?php echo $classcolor;?>" style="font-size: 1.2em;" ></span></a>
                         </td>
                       </tr>
 
@@ -232,7 +270,7 @@ $roleid_person=$_SESSION["roleid_person"];
 $i++;
 ?>
                 <!-- Modal for Read -->
-                        <div class="modal fade bs-example-modal-lg" id="detailbook<?php echo $book2system_book_refid; ?>"  data-backdrop="true"  aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal fade bs-example-modal-lg" id="detailbook<?php echo $book2system_id; ?>"  data-backdrop="true"  aria-labelledby="myModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg">
                           <div class="modal-content">
                             <div class="modal-body" align="left">
@@ -421,7 +459,7 @@ $i++;
                   </div>
 
                 <!-- จบ Modal -->
-                <!-- Modal for Read -->
+                <!-- Modal for Retuen -->
                         <div class="modal fade bs-example-modal-lg" id="returncheckgroup"  data-backdrop="false"  aria-labelledby="myModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg">
                           <div class="modal-content">
@@ -431,9 +469,59 @@ $i++;
                                   <h4 align="left">  เหตุผลการส่งคืน</h4>
                               </div>
                             </div>
-                            <div class="modal-body" align="left">
+                            <div class="modal-body" align="center">
+                                <form id="return_sendbookcomment" data-toggle="validator" role="form" method="POST" onsubmit="return return_sendbook()"  >
+                                <div class="row" style="padding-bottom: 5px;">
+                                        <div class="form-group">
+                                            <label for="returncomment" class="col-sm-2" style="width: 150px" >
+                                                เหตุผลการส่งคืน</label>
+                                            <div  class="col-sm-6 text-left" >
+                                                <input type="text" class="form-control" id="returncomment" placeholder="กรุณาระบุเหตุผล" name="returncomment" required >
+                                            </div>
+                                       </div>
+                                </div>
+                                    
+                                <div class="row form-group" style="padding-bottom: 5px;">
+                                    <button type="submit" class="btn btn-warning" ><span class="glyphicon glyphicon-repeat" aria-hidden="true" ></span>ส่งคืนหนังสือราชการ</button>  
+                                </div>                                            
+                                </form> 
+                                
+                            </div>
+                        	<div class="modal-footer">
+                                    <button class="btn btn-sm" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> ปิดหน้าต่างนี้</button>
+                                </div>
+      
+                      </div>
+                    </div>
+                  </div>
 
-                                <div class="gallery" id="images_preview"></div>
+                <!-- จบ Modal -->
+                <!-- Modal for Finish -->
+                        <div class="modal fade bs-example-modal-lg" id="finishcheckgroup"  data-backdrop="false"  aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                              <div class="row container">
+                                  <h4 align="left">  เหตุผลการยุติเรื่อง</h4>
+                              </div>
+                            </div>
+                            <div class="modal-body" align="center">
+                                <form id="finish_sendbookcomment" data-toggle="validator" role="form" method="POST" onsubmit="return finish_sendbook()"  >
+                                <div class="row" style="padding-bottom: 5px;">
+                                        <div class="form-group">
+                                            <label for="finishcomment" class="col-sm-2" style="width: 150px" >
+                                                เหตุผลการยุติเรื่อง</label>
+                                            <div  class="col-sm-6 text-left" >
+                                                <input type="text" class="form-control" id="finishcomment" placeholder="กรุณาระบุเหตุผล" name="finishcomment" required >
+                                            </div>
+                                       </div>
+                                </div>
+
+                                <div class="row form-group" style="padding-bottom: 5px;">
+                                    <button type="submit" class="btn btn-danger" ><span class="glyphicon glyphicon-remove" aria-hidden="true" ></span>ยุติหนังสือราชการ</button>  
+                                </div>                                            
+                                </form> 
                                 
                             </div>
                         	<div class="modal-footer">
@@ -464,46 +552,46 @@ $i++;
 
     </div><!-- ./wrapper -->
     <!-- jQuery 2.1.4 -->
-    <script src="modules/book2/plugins/jQuery/jQuery-2.1.4.min.js"></script>
+    <script src="./modules/book2/plugins/jQuery/jQuery-2.1.4.min.js"></script>
     <!-- Bootstrap 3.3.5 -->
-    <script src="modules/book2/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./modules/book2/bootstrap/js/bootstrap.min.js"></script>
     <!-- AdminLTE App -->
-    <script src="modules/book2/dist/js/app.min.js"></script>
+    <script src="./modules/book2/dist/js/app.min.js"></script>
     <!-- Selection -->
-    <script src="modules/book2/plugins/selection/bootstrap-select.min.js"></script>
+    <script src="./modules/book2/plugins/selection/bootstrap-select.min.js"></script>
     <!-- iCheck 1.0.1 -->
-    <script src="modules/book2/plugins/iCheck/icheck.min.js"></script>
+    <script src="./modules/book2/plugins/iCheck/icheck.min.js"></script>
     <!-- Select2 -->
-    <script src="modules/book2/plugins/select2/select2.full.min.js"></script>
+    <script src="./modules/book2/plugins/select2/select2.full.min.js"></script>
     <!-- Validator -->
-    <script src="modules/book2/plugins/validator/validator.min.js"></script>
+    <script src="./modules/book2/plugins/validator/validator.min.js"></script>
     <!-- Date Input file -->
-    <script src="modules/book2/plugins/inputfile/fileinput.min.js"></script>
+    <script src="./modules/book2/plugins/inputfile/fileinput.min.js"></script>
     <!-- Date Input file Thai-->
-    <script src="modules/book2/plugins/inputfile/fileinput_locale_th.js"></script>
+    <script src="./modules/book2/plugins/inputfile/fileinput_locale_th.js"></script>
     <!-- Date Input file plugins-->
-    <script src="modules/book2/plugins/inputfile/plugins/canvas-to-blob.min.js"></script>
+    <script src="./modules/book2/plugins/inputfile/plugins/canvas-to-blob.min.js"></script>
     <!-- Date Input file Thai-->
-    <script src="modules/book2/plugins/confirmation/bootstrap-confirmation.min.js"></script>
+    <script src="./modules/book2/plugins/confirmation/bootstrap-confirmation.min.js"></script>
     <!-- Date Picker -->
     <!--<script src="modules/book2/plugins/datepicker/bootstrap-datepicker.js"></script>-->
     <!-- Date Picker Thai -->
     <!--<script src="modules/book2/plugins/datepicker/locales/bootstrap-datepicker.th.js" charset="UTF-8"></script>-->
     <!-- Date Picker New Dist -->
-    <script src="modules/book2/plugins/datepicker/dist/js/bootstrap-datepicker.js"></script>
+    <script src="./modules/book2/plugins/datepicker/dist/js/bootstrap-datepicker.js"></script>
     <!-- Date Picker Thai  New Dist -->
-    <script src="modules/book2/plugins/datepicker/dist/locales/bootstrap-datepicker.th.min.js" charset="UTF-8"></script>
+    <script src="./modules/book2/plugins/datepicker/dist/locales/bootstrap-datepicker.th.min.js" charset="UTF-8"></script>
     <!-- DataTables -->
-    <script src="modules/book2/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="modules/book2/plugins/datatables/dataTables.bootstrap.min.js"></script>
+    <script src="./modules/book2/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="./modules/book2/plugins/datatables/dataTables.bootstrap.min.js"></script>
     <!-- SlimScroll -->
-    <script src="modules/book2/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+    <script src="./modules/book2/plugins/slimScroll/jquery.slimscroll.min.js"></script>
     <!-- FastClick -->
-    <script src="modules/book2/plugins/fastclick/fastclick.min.js"></script>
+    <script src="./modules/book2/plugins/fastclick/fastclick.min.js"></script>
     <!-- Chosen -->
-    <script src="modules/book2/plugins/chosen/chosen.jquery.js"></script>
+    <script src="./modules/book2/plugins/chosen/chosen.jquery.js"></script>
      <!-- My Script -->
-     <script src="modules/book2/main/function.js"></script>
+     <script src="./modules/book2/main/function.js"></script>
        
         <script type="text/javascript">
             
@@ -575,7 +663,7 @@ $i++;
           document.location.reload();
         })     
         </script>
-     
+ 
     <script>
       $(function () {
         //Initialize Select2 Elements
