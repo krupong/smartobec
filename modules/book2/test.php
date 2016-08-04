@@ -2,14 +2,15 @@
 include '../../include/logUtil.php';
 
 // เพิ่ม log ใหม่
-//saveBookLog('12345', "sssssss", "ssssss",'ssssssssss');
+saveBookLog('1113', "ssssss",'ssssssssss','พพพพพพพพพพพพพพ','ดดดดดดดดดดดดดด','allllllllllllllllสสสสสสสสสสสสสส');
 
 // เพิ่ม log ใน ref_id เดิม
-//addBookLog('12345', "aaaaaaaaaaa", "aaaaaaaaaa",'aaaaaaaaaaaaaaaa');
+//addBookLog('1113', "ssssss",'ssssssssss','พพพพพพพพพพพพพพ','ดดดดดดดดดดดดดด','dddddddd');
 
 // แสดง log
-$jsons = json_decode(getBooklog('12345'));
+$jsons = json_decode(getBooklog('1111'));
 foreach ($jsons as $json) {
-	echo "ค่า user = ".$json->user. " ค่า level = ".$json->level." ค่า date = ".$json->date."<br />";
+	echo "ค่า book_table = ".$json->book_table. " ค่า book_idsystem = ".$json->book_idsystem." ค่า book_num = ".$json->book_num
+	." ค่า book_processdate = ".$json->book_processdate." ค่า book_refid = ".$json->book_refid."<br />";
 }
 ?>
