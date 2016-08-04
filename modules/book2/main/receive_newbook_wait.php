@@ -183,9 +183,11 @@ include './modules/book2/main/function.php';
         $book2system_receiver_status=$result_booksystem['receiver_status']; 
         $book2system_receiver_comment=$result_booksystem['receiver_comment']; 
         $book2system_receiver_otherdate=$result_booksystem['receiver_otherdate']; 
+        $book2system_booktable=$result_booksystem['book_table']; 
 
+        if($book2system_booktable=="PP"){
            //แสดงหนังสือรอส่ง
-            $sql_booksend="select * from book2_send where book_refid=? ";
+            $sql_booksend="select * from book2_receive where book_refid=? ";
             $query_booksend = $connect->prepare($sql_booksend);
             $query_booksend->bind_param("s", $book2system_book_refid);
             $query_booksend->execute();
@@ -193,18 +195,21 @@ include './modules/book2/main/function.php';
 
          While ($result_booksend = mysqli_fetch_array($result_qbooksend))
            {
-                $booksend_num=$result_booksend['book_num'];
+                $booksend_num=$result_booksend['book_no'];
                 $booksend_date=$result_booksend['book_date'];
                 $booksend_subject=$result_booksend['book_subject'];
                 $booksend_for=$result_booksend['book_for'];
                 $booksend_detail=$result_booksend['book_detail'];
                 $booksend_comment=$result_booksend['book_comment'];
-                $booksend_fromdepartment=$result_booksend['book_fromdepartment'];
+                $booksend_fromdepartment=$result_booksend['book_from'];
                 $booksend_level=$result_booksend['book_level'];
                 $booksend_secret=$result_booksend['book_secret'];
-
             }
+            
+            $sanodefrom_name=$booksend_fromdepartment;
+            $sanodefrom_nameprecis=$booksend_fromdepartment;
 
+            }else{
         //แสดงหนังสือรอส่ง
             $sql_booksend="select * from book2_send where book_refid=? ";
             $query_booksend = $connect->prepare($sql_booksend);
@@ -223,9 +228,7 @@ include './modules/book2/main/function.php';
                 $booksend_fromdepartment=$result_booksend['book_fromdepartment'];
                 $booksend_level=$result_booksend['book_level'];
                 $booksend_secret=$result_booksend['book_secret'];
-
             }
-
     //หาชื่อหน่วยงานจากโหนด
         $sql_sanodefrom="select * from book2_department where id=?";
         $query_sanodefrom = $connect->prepare($sql_sanodefrom);
@@ -238,6 +241,7 @@ include './modules/book2/main/function.php';
             $sanodefrom_nameprecis=$result_sanodefrom['nameprecis'];
         }
    
+            }//จบเลือกตาราง
   //หาชื่อบุคลากร
             $sql_person="select * from person_main where person_id=?";
             $query_person = $connect->prepare($sql_person);
@@ -267,15 +271,15 @@ include './modules/book2/main/function.php';
          $thyearshort=yeareng2thshort($book2system_receiver_year);
         ?>
                       <tr>
-                          <td><input type="checkbox"  name="checkgroupreceive[]" class="checkbox1"  value="<?php echo $book2system_book_refid;?>" onclick="check(this)"></td>
+                          <td><input type="checkbox"  name="checkgroupreceive[]" class="checkbox1"  value="<?php echo $book2system_id;?>" onclick="check(this)"></td>
                         <td><?php echo $i;?></td>
                         <td><?php echo $booksend_num; ?></td>
                         <td><?php echo $booksend_date; ?></td>
                         <td> <?php echo $booksend_subject; ?></td>
                         <td> <?php echo $sanodefrom_nameprecis; ?></td>
-                        <td> <?php echo $book2system_sender_date; ?></td>
+                        <td> <?php echo $book2system_receiver_date; ?></td>
                         <td> 
-                            <a href="#detailbook<?php echo $book2system_book_refid; ?>" data-toggle="modal" onclick="detailbook('<?php echo $book2system_book_refid;?>');" ><span class="glyphicon glyphicon-list-alt <?php echo $classcolor;?>" style="font-size: 1.2em;" ></span></a>
+                            <a href="#detailbook<?php echo $book2system_id; ?>" data-toggle="modal" onclick="detailbook('<?php echo $book2system_id;?>');" ><span class="glyphicon glyphicon-list-alt <?php echo $classcolor;?>" style="font-size: 1.2em;" ></span></a>
                         (<?php echo $book2system_receiver_no; ?>/<?php echo yeareng2thlong($book2system_receiver_year); ?>)
 
                         </td>
@@ -285,7 +289,7 @@ include './modules/book2/main/function.php';
 $i++;
 ?>
                 <!-- Modal for Read -->
-                        <div class="modal fade bs-example-modal-lg" id="detailbook<?php echo $book2system_book_refid; ?>"  data-backdrop="true"  aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal fade bs-example-modal-lg" id="detailbook<?php echo $book2system_id; ?>"  data-backdrop="true"  aria-labelledby="myModalLabel" aria-hidden="true">
                         <div class="modal-dialog modal-lg">
                           <div class="modal-content">
                             <div class="modal-body" align="left">
