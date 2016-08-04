@@ -9,7 +9,6 @@ include '../../include/logUtil.php';
 
 // แสดง log
 $jsons = json_decode(getBooklog('12345'));
-//echo $json->user;
 foreach ($jsons as $json) {
 	echo "ค่า user = ".$json->user. " ค่า level = ".$json->level." ค่า date = ".$json->date."<br />";
 }
