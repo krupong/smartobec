@@ -128,7 +128,7 @@ $count = "";
 $alertmessage = "";
     
 //เช็คสิทธิ์ก่อน สารบรรณกลาง เขตพื้นที่    
-if($$user_permission_p4 != 0 || $user_permission_p4 !="" ){    
+if($user_permission_p4 != 0 || $user_permission_p4 !="" ){    
     $sql_saraban_index4="select count(book_main.ms_id) as count from book_main, book_sendto_answer where book_main.ref_id=book_sendto_answer.ref_id and  book_sendto_answer.send_to='$user_permission_p4' and book_sendto_answer.answer IS NULL";   
 
     $result_alert4 = mysqli_query($connect, $sql_saraban_index4);

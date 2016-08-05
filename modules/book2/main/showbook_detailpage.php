@@ -270,28 +270,13 @@ $roleid_person=$_SESSION["roleid_person"];
                             </div>
                        </div>
                 </div>
-                                       
-<?php
 
-            //หาชื่อหน่วยงานที่ส่ง
-                $sql_sanode="select * from book2_department where id=? ";
-                $query_sanode = $connect->prepare($sql_sanode);
-                $query_sanode->bind_param("s", $booksend_from);
-                $query_sanode->execute();
-                $result_qsanode=$query_sanode->get_result();
-                    While ($result_sanode = mysqli_fetch_array($result_qsanode))
-                   {
-                            $name_precisdepart=$result_sanode['nameprecis'];
-                   }
-?>
-                    
-                    
-                 <div class="row" style="padding-bottom: 5px;">
+                <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="membookfrom" class="col-sm-2" style="width: 120px" >
                                  จาก</label>
                             <div  class="col-sm-6 text-left" >
-                                <?php echo $name_precisdepart;?>
+                                <?php echo $sa_node_name;?>
                             </div>
                        </div>
                 </div>

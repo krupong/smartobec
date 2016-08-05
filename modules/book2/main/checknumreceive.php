@@ -72,13 +72,15 @@ $book_table="2";
 
 //สถานะหนังสือ  0=ยังไม่รับ 1=ลงรับแล้ว 2=ส่งต่อ 3=ส่งผ่าน 4=ส่งกลับ 5=ยุติเรื่อง
     $receive_status_no="1";
+
+$todayYear=date("Y");
     
 $booksend_num="";
 $booksend_date="";
 //หาหนังสือรับใหม่
-    $sql_booksystem="select * from book2_system where  receiver_department=?  and (receiver_status=1 or receiver_status=2)  order by  receiver_no DESC ";
+    $sql_booksystem="select * from book2_system where  receiver_department=?  and (receiver_status=1 or receiver_status=2) and receiver_year=?  order by  receiver_no DESC ";
     $query_booksystem = $connect->prepare($sql_booksystem);
-    $query_booksystem->bind_param("s", $look_dep_subdep);
+    $query_booksystem->bind_param("ss", $look_dep_subdep,$todayYear);
     $query_booksystem->execute();
     $result_qbooksystem=$query_booksystem->get_result();
     
@@ -102,7 +104,21 @@ $booksend_date="";
                 $booksend_num=$result_booksend['book_no'];
                 $booksend_date=$result_booksend['book_date'];
             }
+         if($booksend_num!=""){
+            $findbookreceive="1";
 
+            ?>
+        <div  class="row container table-hover" style='margin-top:10px; '>
+        
+        <label><span class="glyphicon glyphicon-check"  aria-hidden="true"></span><a href="#" onclick="showdetailreceived('<?php echo $book2system_id;?>')" >
+            <?php echo $booksend_num;?> ลว  <?php echo $booksend_date; ?><BR>
+            เลขรับ <?php echo $book2system_receiver_no;?>/<?php echo yeareng2thshort($book2system_receiver_year); ?> รับวันที่ <?php echo $book2system_receiver_date; ?><BR>
+                </a></label>
+        
+        </div>                       
+
+            <?php
+         }
             }else{
         //แสดงหนังสือรอส่ง
             $sql = "select * from book2_send where book_refid='$book2system_book_refid' and book_num like '%$data%'";
@@ -111,12 +127,9 @@ $booksend_date="";
                 $booksend_num=$result_booksend['book_num'];
                 $booksend_date=$result_booksend['book_date'];
             }
-   
-            }//จบเลือกตาราง 
-
             if($booksend_num!=""){
             $findbookreceive="1";
-            
+
             ?>
         <div  class="row container table-hover" style='margin-top:10px; '>
         
@@ -129,7 +142,9 @@ $booksend_date="";
 
             <?php
             }
-}            
+            }//จบเลือกตาราง 
+
+ }            
         
 
  if($findbookreceive==0){

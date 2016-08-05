@@ -57,7 +57,7 @@ $roleid_person=$_SESSION["roleid_person"];
         $name_predepart=$result_dep['nameprecis'];
    }
 
-?>
+   ?>
 
 <html>
     <head>
@@ -98,9 +98,9 @@ $roleid_person=$_SESSION["roleid_person"];
                     <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="bookno" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membookno" name="membookno" class="flat-green " value="1" > เลขที่หนังสือ</label>
+                                <input type="checkbox" id="membookno" name="membookno" class="flat-green " value="1" <?php if(isset($_SESSION['recpp_membookno'])){echo "checked";}?>> เลขที่หนังสือ</label>
                             <div  class="col-sm-3 text-left" >
-                                <input type="text" class="form-control" id="bookno" placeholder="กรุณากรอกเลขที่หนังสือ" name="bookno" required>
+                                <input type="text" class="form-control" id="bookno" placeholder="กรุณากรอกเลขที่หนังสือ" name="bookno" required value="<?php if(isset($_SESSION['recpp_membookno'])){echo $_SESSION['recpp_membookno'];}else{echo "";}?>">
                             </div>
                              <div  class="col-sm-2 text-left" >
                                  <button type="button" class="btn btn-success"  data-toggle="modal" data-target="#checknumreceive" onclick="checknumreceive();" ><span class="glyphicon glyphicon-check" aria-hidden="true"></span> ตรวจสอบเลขที่หนังสือ</button>
@@ -135,7 +135,7 @@ $roleid_person=$_SESSION["roleid_person"];
                  <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="membooklevel" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membooklevel" name="membooklevel" class="flat-green " value="1" > ชั้นความเร็ว</label>
+                                <input type="checkbox" id="membooklevel" name="membooklevel" class="flat-green " value="1" <?php if(isset($_SESSION['recpp_membooklevel'])){echo "checked";}?>> ชั้นความเร็ว</label>
                             <div  class="col-sm-6 text-left">
 <?php
 //หาชื่อหน่วยงาน
@@ -144,11 +144,18 @@ $roleid_person=$_SESSION["roleid_person"];
     //$query_booklevel->bind_param("i", $user_departid);
     $query_booklevel->execute();
     $result_qbooklevel=$query_booklevel->get_result();
-
-    
+     
     While ($result_booklevel = mysqli_fetch_array($result_qbooklevel))
    {
-        if($result_booklevel['id']==1){$showselected="checked";}else{$showselected="";}
+        if(isset($_SESSION['recpp_membooklevel'])){
+            if($result_booklevel['id']==$_SESSION['recpp_membooklevel']){
+                     $showselected="checked";   
+            }else{     $showselected="";      }
+        
+        }else{
+        if($result_booklevel['id']==1){        $showselected="checked";
+        }else{ $showselected="";   }
+        }
         ?>
         <input type="radio" id="booklevel" name="booklevel" class="flat-red" value="<?php echo  $result_booklevel['id']?>" <?php echo $showselected; ?>> <?php echo $result_booklevel['book_level']; ?> 
    <?php
@@ -161,7 +168,7 @@ $roleid_person=$_SESSION["roleid_person"];
                  <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="membooksecret" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membooksecret" name="membooksecret" class="flat-green " value="1" > ชั้นความลับ</label>
+                                <input type="checkbox" id="membooksecret" name="membooksecret" class="flat-green " value="1" <?php if(isset($_SESSION['recpp_membooksecret'])){echo "checked";}?>> ชั้นความลับ</label>
                             <div  class="col-sm-6 text-left">
 <?php
 //หาชื่อหน่วยงาน
@@ -172,7 +179,14 @@ $roleid_person=$_SESSION["roleid_person"];
     $result_qbooksecret=$query_booksecret->get_result();
     While ($result_booksecret = mysqli_fetch_array($result_qbooksecret))
    {
-        if($result_booksecret['id']==1){$showchecked="checked";}else{$showchecked="";}
+        if(isset($_SESSION['recpp_membooksecret'])){
+            if($result_booksecret['id']==$_SESSION['recpp_membooksecret']){
+                     $showchecked="checked";   
+            }else{     $showchecked="";      }
+        }else{
+        if($result_booksecret['id']==1){        $showchecked="checked";
+        }else{ $showchecked="";   }
+        }
         ?>
         <input type="radio" id="booksecret" name="booksecret" class="flat-red" value="<?php echo  $result_booksecret['id']?>" <?php echo $showchecked; ?>> <?php echo $result_booksecret['book_secret']; ?>  
    <?php
@@ -191,10 +205,10 @@ $today=date("d-m-Y");
                  <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="bookdate" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membookdate" name="membookdate" class="flat-green " value="1" > ลงวันที่</label>
+                                <input type="checkbox" id="membookdate" name="membookdate" class="flat-green " value="1" <?php if(isset($_SESSION['recpp_membookdate'])){echo "checked";}?>> ลงวันที่</label>
                              <div  class="col-sm-3 text-left" >
                                     <div class="input-group date" id="datepicker2" >
-                                        <input type="text" class="form-control" name="bookdate" id="bookdate" value="<?php echo $today;?>"   required/>
+                                        <input type="text" class="form-control" name="bookdate" id="bookdate"   required value="<?php if(isset($_SESSION['recpp_membookdate'])){echo $_SESSION['recpp_membookdate'];}else{echo $today;}?>"/>
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -206,9 +220,9 @@ $today=date("d-m-Y");
                 <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="booksubject" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membooksubject" name="membooksubject" class="flat-green " value="1" > เรื่อง</label>
+                                <input type="checkbox" id="membooksubject" name="membooksubject" class="flat-green " value="1" <?php if(isset($_SESSION['recpp_membooksubject'])){echo "checked";}?>> เรื่อง</label>
                             <div  class="col-sm-6 text-left" >
-                                <input type="text" class="form-control" id="booksubject" placeholder="กรุณากรอกเรื่อง" name="booksubject" required>
+                                <input type="text" class="form-control" id="booksubject" placeholder="กรุณากรอกเรื่อง" name="booksubject" required value="<?php if(isset($_SESSION['recpp_membooksubject'])){echo $_SESSION['recpp_membooksubject'];}else{echo "";}?>">
                             </div>
                        </div>
                 </div>
@@ -216,9 +230,9 @@ $today=date("d-m-Y");
                 <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="bookfor" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membookfor" name="membookfor" class="flat-green " value="1" > เรียน</label>
+                                <input type="checkbox" id="membookfor" name="membookfor" class="flat-green " value="1" <?php if(isset($_SESSION['recpp_membookfor'])){echo "checked";}?>> เรียน</label>
                             <div  class="col-sm-5 text-left" >
-                                <input type="text" class="form-control" id="bookfor" placeholder="กรุณาระบุข้อมูล" name="bookfor" required>
+                                <input type="text" class="form-control" id="bookfor" placeholder="กรุณาระบุข้อมูล" name="bookfor" required value="<?php if(isset($_SESSION['recpp_membookfor'])){echo $_SESSION['recpp_membookfor'];}else{echo "";}?>">
                             </div>
                        </div>
                 </div>
@@ -226,9 +240,9 @@ $today=date("d-m-Y");
                  <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="bookfrom" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membookfrom" name="membookfrom" class="flat-green " value="1" > จาก</label>
+                                <input type="checkbox" id="membookfrom" name="membookfrom" class="flat-green " value="1" <?php if(isset($_SESSION['recpp_membookfrom'])){echo "checked";}?>> จาก</label>
                             <div  class="col-sm-5 text-left" >
-                                <input type="text" class="form-control" id="bookfrom" placeholder="กรุณาระบุหน่วยงานที่ส่งมา" name="bookfrom" required>
+                                <input type="text" class="form-control" id="bookfrom" placeholder="กรุณาระบุหน่วยงานที่ส่งมา" name="bookfrom" required value="<?php if(isset($_SESSION['recpp_membookfrom'])){echo $_SESSION['recpp_membookfrom'];}else{echo "";}?>">
                             </div>
                        </div>
                 </div>
@@ -236,9 +250,9 @@ $today=date("d-m-Y");
                   <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="bookcomment" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membookcomment" name="membookcomment" class="flat-green " value="1" > หมายเหตุ</label>
+                                <input type="checkbox" id="membookcomment" name="membookcomment" class="flat-green " value="1" <?php if(isset($_SESSION['recpp_membookcomment'])){echo "checked";}?>> หมายเหตุ</label>
                             <div  class="col-sm-5 text-left" >
-                                <textarea class="form-control" id="bookcomment" placeholder="ระบุหมายเหตุ" name="bookcomment"  rows="3"></textarea>
+                                <textarea class="form-control" id="bookcomment" placeholder="ระบุหมายเหตุ" name="bookcomment"  rows="3" ><?php if(isset($_SESSION['recpp_membookcomment'])){echo $_SESSION['recpp_membookcomment'];}else{echo "";}?></textarea>
                             </div>
                        </div>
                 </div>
@@ -261,15 +275,8 @@ $today=date("d-m-Y");
                        </div>
                   </div> 
 
-                <!-- Get Process -->
-                <?php
-                $timestamp = mktime(date("H"), date("i"),date("s"), date("m") ,date("d"), date("Y"))  ;	
-                //timestamp เวลาปัจจุบัน 
-                $rand_number=rand();
-                $ref_id = $timestamp."x".$rand_number;
-                ?>
                 
-                <input type="hidden" name="bookrefid" value="<?php echo $ref_id;?>" />
+                <input type="hidden" name="bookrefid" value="" />
                 <input type="hidden" name="bookstatus" value="1" />
                 <input type="hidden" name="inputpermistype" value="rcpaperbook" />
                 <input type="hidden" name="inputprocess" value="inputprocess" />
