@@ -109,6 +109,13 @@ if(isset($_POST['bookrefid'])){
 $inputbookrefid=mysqli_real_escape_string($connect,$_POST['bookrefid']);
 }else {$inputbookrefid=""; }
 //echo $inputbookrefid;
+    //กำหนด ref_id
+    $timestamp = mktime(date("H"), date("i"),date("s"), date("m") ,date("d"), date("Y"))  ;	
+    //timestamp เวลาปัจจุบัน 
+    $rand_number=rand();
+    $ref_id = $timestamp."x".$rand_number;
+    $inputbookrefid=$ref_id;
+
 if(isset($_POST['bookfromorgtb'])){
 $inputbookfromorgtb=mysqli_real_escape_string($connect,$_POST['bookfromorgtb']);
 }else {$inputbookfromorgtb=""; }
@@ -201,6 +208,53 @@ $roleid_person=$_SESSION["roleid_person"];
     $result_noupdate=$dbquery_noupdate->get_result();
     }
 
+//เก็บค่า SESSION  กรณีจำค่า
+if(isset($_POST['membooklevel'])){
+$membooklevel=mysqli_real_escape_string($connect,$_POST['membooklevel']);
+if($membooklevel==1){$_SESSION['sbook_membooklevel']=$inputbooklevel;}  //เก็บให้จำไว้
+else{ unset($_SESSION["sbook_membooklevel"]);}
+}else {$membooklevel=""; unset($_SESSION["sbook_membooklevel"]);}
+if(isset($_POST['membooksecret'])){
+$membooksecret=mysqli_real_escape_string($connect,$_POST['membooksecret']);
+if($membooksecret==1){$_SESSION['sbook_membooksecret']=$inputbooksecret;}  //เก็บให้จำไว้
+else{ unset($_SESSION["sbook_membooksecret"]);}
+}else {$membooksecret=""; unset($_SESSION["sbook_membooksecret"]);}
+if(isset($_POST['membookdate'])){
+$membookdate=mysqli_real_escape_string($connect,$_POST['membookdate']);
+if($membookdate==1){$_SESSION['sbook_membookdate']=$_POST['bookdate'];}  //เก็บให้จำไว้
+else{ unset($_SESSION["sbook_membookdate"]);}
+}else {$membookdate="";unset($_SESSION["sbook_membookdate"]); }
+if(isset($_POST['membooksubject'])){
+$membooksubject=mysqli_real_escape_string($connect,$_POST['membooksubject']);
+if($membooksubject==1){$_SESSION['sbook_membooksubject']=$inputbooksubject;}  //เก็บให้จำไว้
+else{ unset($_SESSION["sbook_membooksubject"]);}
+}else {$membooksubject=""; unset($_SESSION["sbook_membooksubject"]);}
+if(isset($_POST['membookfor'])){
+$membookfor=mysqli_real_escape_string($connect,$_POST['membookfor']);
+if($membookfor==1){$_SESSION['sbook_membookfor']=$inputbookfor;}  //เก็บให้จำไว้
+else{ unset($_SESSION["sbook_membookfor"]);}
+}else {$membookfor=""; unset($_SESSION["sbook_membookfor"]);}
+if(isset($_POST['membookdetail'])){
+$membookdetail=mysqli_real_escape_string($connect,$_POST['membookdetail']);
+if($membookdetail==1){$_SESSION['sbook_membookdetail']=$inputbookdetail;}  //เก็บให้จำไว้
+else{ unset($_SESSION["sbook_membookdetail"]);}
+}else {$membookdetail=""; unset($_SESSION["sbook_membookdetail"]);}
+if(isset($_POST['membookto'])){
+$membookto=mysqli_real_escape_string($connect,$_POST['membookto']);
+if($membookto==1){$_SESSION['sbook_membookto']=$sendtoorg;}  //เก็บให้จำไว้
+else{ unset($_SESSION["sbook_membookto"]);}
+}else {$membookto=""; unset($_SESSION["sbook_membookto"]);}
+if(isset($_POST['membookfrom'])){
+$membookfrom=mysqli_real_escape_string($connect,$_POST['membookfrom']);
+if($membookfrom==1){$_SESSION['sbook_membookfrom']=$inputbookfrom;}  //เก็บให้จำไว้
+else{ unset($_SESSION["sbook_membookfrom"]);}
+}else {$membookfrom=""; unset($_SESSION["sbook_membookfrom"]);}
+if(isset($_POST['membookcomment'])){
+$membookcomment=mysqli_real_escape_string($connect,$_POST['membookcomment']);
+if($membookcomment==1){$_SESSION['sbook_membookcomment']=$inputbookcomment;}  //เก็บให้จำไว้
+else{ unset($_SESSION["sbook_membookcomment"]);}
+}else {$membookcomment=""; unset($_SESSION["sbook_membookcomment"]);}    
+    
   //redirect ไปหน้าอื่นๆ
 ?>
 

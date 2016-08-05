@@ -1,5 +1,5 @@
 <?php
-
+ob_start();
 //header("content-type:text/javascript;charset=utf-8");   
 $userlogin=$_SESSION['login_user_id'];
 if(isset($_SESSION['role_id'])){
@@ -18,6 +18,12 @@ $inputbookwoshow="";
 //โชว์วันที่วันนี้
 $today=date("d-m-Y");
 $todaydatetime=date("Y-m-d H:i:s");
+
+    //กำหนด ref_id
+    $timestamp = mktime(date("H"), date("i"),date("s"), date("m") ,date("d"), date("Y"))  ;	
+    //timestamp เวลาปัจจุบัน 
+    $rand_number=rand();
+    $ref_id = $timestamp."x".$rand_number;
 
 //$inputusername=$_SESSION['login_user_id'];;
         
@@ -47,12 +53,12 @@ $inputbooktype=mysqli_real_escape_string($connect,$_POST['booktype']);
 if(isset($_POST['bookrefid'])){
 $inputbookrefid=mysqli_real_escape_string($connect,$_POST['bookrefid']);
 }else {$inputbookrefid=""; }
-
+$inputbookrefid=$ref_id;
 $bookfrom_table="PP";
 //คำนวณ
     if($inputpermistype=="rcpaperbook"){
-
-        
+$inputpermistype="";
+$inputprocess="";        
 //นำเข้าเลขหนังสือส่ง
 if(isset($_POST['bookno'])){
 $inputbookno=mysqli_real_escape_string($connect,$_POST['bookno']);
@@ -192,16 +198,62 @@ $roleid_person=$_SESSION["roleid_person"];
        $result_insert=$dbquery_insert->get_result();
        }
 
-    
+//เก็บค่า SESSION การจำค่ากรณีส่งซ้ำ     
+if(isset($_POST['membookno'])){
+$membookno=mysqli_real_escape_string($connect,$_POST['membookno']);
+if($membookno==1){$_SESSION['recpp_membookno']=$inputbookno;}  //เก็บให้จำไว้
+else{ unset($_SESSION["recpp_membookno"]);}
+}else {$membookno=""; unset($_SESSION["recpp_membookno"]);}
+if(isset($_POST['membooklevel'])){
+$membooklevel=mysqli_real_escape_string($connect,$_POST['membooklevel']);
+if($membooklevel==1){$_SESSION['recpp_membooklevel']=$inputbooklevel;}  //เก็บให้จำไว้
+else{ unset($_SESSION["recpp_membooklevel"]);}
+}else {$membooklevel=""; unset($_SESSION["recpp_membooklevel"]);}
+if(isset($_POST['membooksecret'])){
+$membooksecret=mysqli_real_escape_string($connect,$_POST['membooksecret']);
+if($membooksecret==1){$_SESSION['recpp_membooksecret']=$inputbooksecret;}  //เก็บให้จำไว้
+else{ unset($_SESSION["recpp_membooksecret"]);}
+}else {$membooksecret=""; unset($_SESSION["recpp_membooksecret"]);}
+if(isset($_POST['membookdate'])){
+$membookdate=mysqli_real_escape_string($connect,$_POST['membookdate']);
+if($membookdate==1){$_SESSION['recpp_membookdate']=$_POST['bookdate'];}  //เก็บให้จำไว้
+else{ unset($_SESSION["recpp_membookdate"]);}
+}else {$membookdate="";unset($_SESSION["recpp_membookdate"]); }
+if(isset($_POST['membooksubject'])){
+$membooksubject=mysqli_real_escape_string($connect,$_POST['membooksubject']);
+if($membooksubject==1){$_SESSION['recpp_membooksubject']=$inputbooksubject;}  //เก็บให้จำไว้
+else{ unset($_SESSION["recpp_membooksubject"]);}
+}else {$membooksubject=""; unset($_SESSION["recpp_membooksubject"]);}
+if(isset($_POST['membookfor'])){
+$membookfor=mysqli_real_escape_string($connect,$_POST['membookfor']);
+if($membookfor==1){$_SESSION['recpp_membookfor']=$inputbookfor;}  //เก็บให้จำไว้
+else{ unset($_SESSION["recpp_membookfor"]);}
+}else {$membookfor=""; unset($_SESSION["recpp_membookfor"]);}
+if(isset($_POST['membookdetail'])){
+$membookdetail=mysqli_real_escape_string($connect,$_POST['membookdetail']);
+if($membookdetail==1){$_SESSION['recpp_membookdetail']=$inputbookdetail;}  //เก็บให้จำไว้
+else{ unset($_SESSION["recpp_membookdetail"]);}
+}else {$membookdetail=""; unset($_SESSION["recpp_membookdetail"]);}
+if(isset($_POST['membookfrom'])){
+$membookfrom=mysqli_real_escape_string($connect,$_POST['membookfrom']);
+if($membookfrom==1){$_SESSION['recpp_membookfrom']=$inputbookfrom;}  //เก็บให้จำไว้
+else{ unset($_SESSION["recpp_membookfrom"]);}
+}else {$membookfrom=""; unset($_SESSION["recpp_membookfrom"]);}
+if(isset($_POST['membookcomment'])){
+$membookcomment=mysqli_real_escape_string($connect,$_POST['membookcomment']);
+if($membookcomment==1){$_SESSION['recpp_membookcomment']=$inputbookcomment;}  //เก็บให้จำไว้
+else{ unset($_SESSION["recpp_membookcomment"]);}
+}else {$membookcomment=""; unset($_SESSION["recpp_membookcomment"]);}    
+
   //redirect ไปหน้าอื่นๆ
 ?>
 
 <script langquage='javascript'>
 window.location="?option=book2&task=main/receive_newbook_wait";
 </script>
- 
- OK!!!
+
 <?php
+
 $inputprocess="";
     }
 ?>

@@ -61,7 +61,7 @@ window.location="?option=book2&task=main/roleperson";
                  <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="membooklevel" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membooklevel" name="membooklevel" class="flat-green " value="1" > ชั้นความเร็ว</label>
+                                <input type="checkbox" id="membooklevel" name="membooklevel" class="flat-green " value="1" <?php if(isset($_SESSION['sbook_membooklevel'])){echo "checked";}?> > ชั้นความเร็ว</label>
                             <div  class="col-sm-6 text-left">
 <?php
 //หาชื่อหน่วยงาน
@@ -74,7 +74,15 @@ window.location="?option=book2&task=main/roleperson";
     
     While ($result_booklevel = mysqli_fetch_array($result_qbooklevel))
    {
-        if($result_booklevel['id']==1){$showselected="checked";}else{$showselected="";}
+          if(isset($_SESSION['sbook_membooklevel'])){
+            if($result_booklevel['id']==$_SESSION['sbook_membooklevel']){
+                     $showselected="checked";   
+            }else{     $showselected="";      }
+        
+        }else{
+        if($result_booklevel['id']==1){        $showselected="checked";
+        }else{ $showselected="";   }
+        }
         ?>
         <input type="radio" id="booklevel" name="booklevel" class="flat-blue " value="<?php echo  $result_booklevel['id']?>" <?php echo $showselected; ?>> <?php echo $result_booklevel['book_level']; ?> 
    <?php
@@ -87,7 +95,7 @@ window.location="?option=book2&task=main/roleperson";
                  <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="membooksecret" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membooksecret" name="membooksecret" class="flat-green " value="1" > ชั้นความลับ</label>
+                                <input type="checkbox" id="membooksecret" name="membooksecret" class="flat-green " value="1" <?php if(isset($_SESSION['sbook_membooksecret'])){echo "checked";}?>> ชั้นความลับ</label>
                             <div  class="col-sm-6 text-left">
 <?php
 //หาชื่อหน่วยงาน
@@ -98,7 +106,14 @@ window.location="?option=book2&task=main/roleperson";
     $result_qbooksecret=$query_booksecret->get_result();
     While ($result_booksecret = mysqli_fetch_array($result_qbooksecret))
    {
-        if($result_booksecret['id']==1){$showchecked="checked";}else{$showchecked="";}
+        if(isset($_SESSION['sbook_membooksecret'])){
+            if($result_booksecret['id']==$_SESSION['sbook_membooksecret']){
+                     $showchecked="checked";   
+            }else{     $showchecked="";      }
+        }else{
+        if($result_booksecret['id']==1){        $showchecked="checked";
+        }else{ $showchecked="";   }
+        }
         ?>
         <input type="radio" id="booksecret" name="booksecret" class="flat-blue " value="<?php echo  $result_booksecret['id']?>" <?php echo $showchecked; ?>> <?php echo $result_booksecret['book_secret']; ?>  
    <?php
@@ -113,9 +128,9 @@ window.location="?option=book2&task=main/roleperson";
                 <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="booksubject" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membooksubject" name="membooksubject" class="flat-green " value="1"  > เรื่อง</label>
+                                <input type="checkbox" id="membooksubject" name="membooksubject" class="flat-green " value="1"  <?php if(isset($_SESSION['sbook_membooksubject'])){echo "checked";}?>> เรื่อง</label>
                             <div  class="col-sm-6 text-left" >
-                                <input type="text" class="form-control" id="booksubject" placeholder="กรุณากรอกเรื่อง" name="booksubject" required >
+                                <input type="text" class="form-control" id="booksubject" placeholder="กรุณากรอกเรื่อง" name="booksubject" required value="<?php if(isset($_SESSION['sbook_membooksubject'])){echo $_SESSION['sbook_membooksubject'];}else{echo "";}?>">
                             </div>
                        </div>
                 </div>
@@ -123,9 +138,9 @@ window.location="?option=book2&task=main/roleperson";
                 <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="bookfor" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membookfor" name="membookfor" class="flat-green " value="1" > เรียน</label>
+                                <input type="checkbox" id="membookfor" name="membookfor" class="flat-green " value="1" <?php if(isset($_SESSION['sbook_membookfor'])){echo "checked";}?>> เรียน</label>
                             <div  class="col-sm-6 text-left" >
-                                <input type="text" class="form-control" id="bookfor" placeholder="กรุณาระบุข้อมูล" name="bookfor" required>
+                                <input type="text" class="form-control" id="bookfor" placeholder="กรุณาระบุข้อมูล" name="bookfor" required value="<?php if(isset($_SESSION['sbook_membookfor'])){echo $_SESSION['sbook_membookfor'];}else{echo "";}?>">
                             </div>
                        </div>
                 </div>
@@ -133,9 +148,9 @@ window.location="?option=book2&task=main/roleperson";
                   <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="bookdetail" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membookdetail" name="membookdetail" class="flat-green " value="1" > รายละเอียด</label>
+                                <input type="checkbox" id="membookdetail" name="membookdetail" class="flat-green " value="1" <?php if(isset($_SESSION['sbook_membookdetail'])){echo "checked";}?>> รายละเอียด</label>
                             <div  class="col-sm-6 text-left" >
-                                <textarea class="form-control" id="bookdetail" placeholder="ระบุรายละเอียด" name="bookdetail"  rows="2"></textarea>
+                                <textarea class="form-control" id="bookdetail" placeholder="ระบุรายละเอียด" name="bookdetail"  rows="2"><?php if(isset($_SESSION['sbook_membookdetail'])){echo $_SESSION['sbook_membookdetail'];}else{echo "";}?></textarea>
                             </div>
                        </div>
                 </div>
@@ -143,7 +158,7 @@ window.location="?option=book2&task=main/roleperson";
                 <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="membookto" class="col-sm-1" style="width: 140px" >
-                                <input type="checkbox" id="membookto" name="membookto" class="flat-green " value="1" > ถึง</label>
+                                <input type="checkbox" id="membookto" name="membookto" class="flat-green " value="1" <?php if(isset($_SESSION['sbook_membookto'])){echo "checked";}?>> ถึง</label>
 
 <!--                                <div  class="col-sm-6 text-left " >
 
@@ -422,25 +437,25 @@ $roleid_person=$_SESSION["roleid_person"];
                  <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="membookfrom" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membookfrom" name="membookfrom" class="flat-green " value="1" > จาก</label>
+                                <input type="checkbox" id="membookfrom" name="membookfrom" class="flat-green " value="1" <?php if(isset($_SESSION['sbook_membookfrom'])){echo "checked";}?>> จาก</label>
                             <div  class="col-sm-6 text-left" >
                                 <select class="form-control" id="bookfrom"  data-placeholder="กรุณาระบุหน่วยงานที่ส่ง" style="width: 100%;" name="bookfrom" >
                                 <?php 
-                                    echo "<option value=".$look_dep_subdep.">".$name_predepart."</option>";
+                                    echo "<option value=".$look_dep_subdep." >".$name_predepart."</option>";
                                 ?>
                                 </select>               
 
-                                <!--<input type="text" class="form-control" id="bookfrom" placeholder="กรุณาระบุหน่วยงานที่ส่งมา" name="bookfrom" required>-->
                             </div>
                        </div>
-                </div>
+                </div>                                <!--<input type="text" class="form-control" id="bookfrom" placeholder="กรุณาระบุหน่วยงานที่ส่งมา" name="bookfrom" required>-->
+
                    
                   <div class="row" style="padding-bottom: 5px;">
                         <div class="form-group">
                             <label for="bookcomment" class="col-sm-2" style="width: 140px" >
-                                <input type="checkbox" id="membookcomment" name="membookcomment" class="flat-green " value="1" > หมายเหตุ</label>
+                                <input type="checkbox" id="membookcomment" name="membookcomment" class="flat-green " value="1" <?php if(isset($_SESSION['sbook_membookcomment'])){echo "checked";}?>> หมายเหตุ</label>
                             <div  class="col-sm-6 text-left" >
-                                <textarea class="form-control" id="bookcomment" placeholder="ระบุหมายเหตุ" name="bookcomment"  rows="2"></textarea>
+                                <textarea class="form-control" id="bookcomment" placeholder="ระบุหมายเหตุ" name="bookcomment"  rows="2"><?php if(isset($_SESSION['sbook_membookcomment'])){echo $_SESSION['sbook_membookcomment'];}else{echo "";}?></textarea>
                             </div>
                        </div>
                 </div>
@@ -455,16 +470,42 @@ $roleid_person=$_SESSION["roleid_person"];
 	<div>Selected root keys: <span id="echoSelectionRootKeys3">-</span></div>
 	<div>Selected root nodes: <span id="echoSelectionRoots3">-</span></div>
                 -->
-        
-                <!-- Get Process -->
-                <?php
-                $timestamp = mktime(date("H"), date("i"),date("s"), date("m") ,date("d"), date("Y"))  ;	
-                //timestamp เวลาปัจจุบัน 
-                $rand_number=rand();
-                $ref_id = $timestamp."x".$rand_number;
-                ?>
+ <!-- ทดสอบเพิ่มจร้าาา -->
+                    <div class="row" style="padding-bottom: 5px;padding-top: 20px;">
+                        <div class="form-group">
+                            <label for="memsenddirector" class="col-sm-1 text-right"  >
+                                <input type="checkbox" id="memsenddirector" name="memsenddirector" class="flat-green " value="1" ></label>
+                            <div  class="col-sm-9 text-left" >
+<?php
+//หาชื่อหน่วยงาน
+    $sql_person_name="select * from person_main where status=0 ";
+    $query_person_name = $connect->prepare($sql_person_name);
+    //$query_person_name->bind_param("i", $user_departid);
+    $query_person_name->execute();
+    $result_qperson_name=$query_person_name->get_result();
+?>
+<select class="select2up form-control" multiple="multiple" data-placeholder="กรุณาเลือกเพื่อส่งผู้บริหาร" style="width: 100%;" >
+<?php
+    While ($result_person_name = mysqli_fetch_array($result_qperson_name))
+   {
+    echo "<option value=".$result_person_name['person_id'].">".$result_person_name['name']." ".$result_person_name['surname']."</option>";
+    }
+?>
+</select>
+                            </div>
+                             <div  class="col-sm-1 text-left" >
+                                 <button type="button" class="btn btn-danger clearselect2up"  ><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+                            </div>
+                       </div>
+                </div>
+ 
+ 
+ 
+ 
+ <!-- จบทดสอบจร้าาา -->
                 
-                <input type="hidden" name="bookrefid" value="<?php echo $ref_id;?>" />
+               
+                <input type="hidden" name="bookrefid" value="" />
                 <input type="hidden" name="bookstatus" value="6" />
                 <input type="hidden" name="inputpermistype" value="addbook" />
                 <input type="hidden" name="inputprocess" value="inputprocess" />
@@ -498,14 +539,14 @@ $roleid_person=$_SESSION["roleid_person"];
      
  <!-- Bootstrap 3.3.5 -->
     <script src="./modules/book2/bootstrap/js/bootstrap.min.js"></script>
+    <!-- Select2 -->
+    <script src="./modules/book2/plugins/select2/select2.full.min.js"></script>
     <!-- AdminLTE App -->
     <script src="./modules/book2/dist/js/app.min.js"></script>
     <!-- Selection -->
     <script src="./modules/book2/plugins/selection/bootstrap-select.min.js"></script>
     <!-- iCheck 1.0.1 -->
     <script src="./modules/book2/plugins/iCheck/icheck.min.js"></script>
-    <!-- Select2 -->
-    <script src="./modules/book2/plugins/select2/select2.full.min.js"></script>
     <!-- Validator -->
     <script src="./modules/book2/plugins/validator/validator.min.js"></script>
     <!-- Date Input file -->
@@ -544,7 +585,7 @@ $roleid_person=$_SESSION["roleid_person"];
                   tags: true,
                   tokenSeparators: [',']
         });
-
+ 
         $(".clearselect2up").on("click", function () { $select2up.val(null).trigger("change"); });
         
 
